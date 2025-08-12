@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Online Tools — Image & PDF Utilities</title>
+  <meta name="description" content="Free online tools for image and PDF processing. Compress, convert, merge, and edit files instantly in your browser." />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0066ff;
+      --secondary: #f5f8ff;
+      --text-dark: #1f2937;
+      --text-light: #6b7280;
+      --radius: 12px;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #fff;
+      color: var(--text-dark);
+      line-height: 1.5;
+    }
+    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      margin-left: 1rem;
+      font-weight: 500;
+    }
+    .hero {
+      background: var(--secondary);
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .hero h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      max-width: 600px;
+      margin: 0 auto 2rem;
+      color: var(--text-light);
+    }
+    .tools-section {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+    .tool-card {
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      padding: 1.5rem;
+      text-align: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .tool-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+    .tool-card img {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 1rem;
+    }
+    .tool-card h3 {
+      margin-bottom: 0.5rem;
+      font-size: 1.2rem;
+    }
+    .tool-card p {
+      color: var(--text-light);
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+    }
+    .tool-card a {
+      display: inline-block;
+      background: var(--primary);
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: background 0.2s ease;
+    }
+    .tool-card a:hover {
+      background: #004fcc;
+    }
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      background: var(--secondary);
+      color: var(--text-light);
+      margin-top: 2rem;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>My Online Tools</h1>
+    <nav>
+      <a href="#">Home</a>
+      <a href="#">Image Tools</a>
+      <a href="#">PDF Tools</a>
+      <a href="#">Contact</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h2>All-in-One Image & PDF Tools</h2>
+    <p>Compress, convert, merge, and edit images and PDFs quickly — all in your browser with a simple, user-friendly interface.</p>
+  </section>
+
+  <section class="tools-section">
+    <div class="tool-card">
+      <a href="image-compressor.html" class="tool-card" style="text-decoration:none; color:inherit;">
+      <img src="https://img.icons8.com/color/96/compress.png" alt="Image Compressor" />
+      <h3>Image Compressor</h3>
+      <p>Reduce image file sizes while keeping high quality for faster load times.</p>
+      </a>
+    </div>
+    <div class="tool-card">
+      <img src="https://img.icons8.com/color/96/convert.png" alt="Image Converter" />
+      <h3>Image Converter</h3>
+      <p>Convert images between formats like JPEG, PNG, and WebP easily.</p>
+      <a href="image-converter.html">Try Now</a>
+    </div>
+    <div class="tool-card">
+      <img src="https://img.icons8.com/color/96/pdf.png" alt="PDF Merger" />
+      <h3>PDF Merger</h3>
+      <p>Combine multiple PDF files into one seamless document.</p>
+      <a href="pdf-merger.html">Try Now</a>
+    </div>
+    <div class="tool-card">
+      <img src="https://img.icons8.com/color/96/split-files.png" alt="PDF Splitter" />
+      <h3>PDF Splitter</h3>
+      <p>Split a large PDF into smaller, easy-to-manage files.</p>
+      <a href="pdf-splitter.html">Try Now</a>
+    </div>
+    <div class="tool-card">
+      <img src="https://img.icons8.com/color/96/resize.png" alt="Image Resizer" />
+      <h3>Image Resizer</h3>
+      <p>Resize images to custom dimensions without losing quality.</p>
+      <a href="image-resizer.html">Try Now</a>
+    </div>
+    <div class="tool-card">
+      <img src="https://img.icons8.com/color/96/edit-image.png" alt="Image Editor" />
+      <h3>Image Editor</h3>
+      <p>Edit images online with filters, crop, and annotations.</p>
+      <a href="image-editor.html">Try Now</a>
+    </div>
+  </section>
+
+  <footer>
+    &copy; <span id="year"></span> My Online Tools. All rights reserved.
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
