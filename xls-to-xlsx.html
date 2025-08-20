@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>XLS to XLSX Converter — Office Tools</title>
+  <meta name="description" content="Convert old Excel .xls files to modern .xlsx format directly in your browser. Secure, fast, and free.">
+  <meta name="keywords" content="xls to xlsx, excel converter, convert excel online, office tools">
+  <meta name="robots" content="index, follow">
+  <style>
+    :root{
+      --accent:#0b84ff;
+      --bg:#ffffff;
+      --card:#ffffff;
+      --text:#111111;
+      --muted:#566173;
+      --border:#e5e7eb;
+      --shadow:0 8px 24px rgba(10,20,40,.08);
+      --menu-bg:#ffffff;
+      --success:#22c55e;
+    }
+    [data-theme="dark"]{
+      --bg:#0b0f15;
+      --card:#0e141c;
+      --text:#f1f5f9;
+      --muted:#cbd5e1;
+      --border:#1f2a37;
+      --shadow:0 18px 40px rgba(0,0,0,.55);
+      --menu-bg:#101823;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);}
+    a{color:inherit;text-decoration:none}
+    header{position:sticky;top:0;z-index:1000;background:var(--card);box-shadow:var(--shadow)}
+    .nav{display:flex;align-items:center;justify-content:space-between;max-width:1200px;margin:0 auto;padding:.7rem 1rem;gap:12px}
+    .brand{display:flex;align-items:center;gap:10px}
+    .brand-badge{width:36px;height:36px;border-radius:9px;background:var(--accent);display:grid;place-items:center;color:#fff;font-weight:800}
+    .brand-name{font-weight:800;font-size:1.05rem}
+    .menu{display:flex;gap:10px;align-items:center}
+    .menu > li{list-style:none;position:relative}
+    .menu > li > a{padding:.55rem .8rem;border-radius:8px;display:flex;align-items:center;gap:6px}
+    .menu > li:hover > a{background:rgba(11,132,255,.08)}
+    .submenu{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--menu-bg);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);min-width:220px;max-height:60vh;overflow:auto}
+    .submenu a{display:block;padding:.6rem .9rem;border-bottom:1px solid rgba(0,0,0,.04)}
+    .submenu a:last-child{border-bottom:none}
+    .menu > li:hover .submenu{display:block}
+    .spacer{flex:1}
+    .toggle{border:1px solid var(--border);background:transparent;color:var(--text);padding:.45rem .8rem;border-radius:8px;cursor:pointer}
+    main{max-width:1200px;margin:1.5rem auto;padding:0 1rem}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:16px}
+    .drop{border:2px dashed var(--border);border-radius:12px;padding:22px;text-align:center;cursor:pointer;transition:.15s;background:transparent}
+    .drop.drag{background:rgba(11,132,255,.07)}
+    .controls{display:flex;flex-wrap:wrap;gap:12px;margin:14px 0}
+    .control{flex:1;min-width:170px}
+    label{display:block;font-size:.9rem;color:var(--muted);margin-bottom:6px}
+    input,select{width:100%;padding:.55rem;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text)}
+    .primary{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:.6rem 1rem;cursor:pointer}
+    .results{display:flex;flex-direction:column;gap:18px;margin-top:16px}
+    .pair{display:flex;gap:22px;flex-wrap:wrap; align-items: flex-end}
+    .col{flex:1;min-width:260px}
+    .col img{max-width:100%;border-radius:10px;box-shadow:var(--shadow)}
+    .meta{font-size:.85rem;color:var(--muted);margin-top:6px}
+    .download{display:none;margin-top:8px;background:var(--success);color:#fff;padding:.45rem .8rem;border-radius:8px}
+    .progress{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:8px auto;display:none}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    footer{padding:20px;text-align:center;color:var(--muted)}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+  <header>
+    <nav class="nav">
+      <div class="brand">
+        <div class="brand-badge">OT</div>
+        <div class="brand-name">Office Tools</div>
+      </div>
+      <ul class="menu">
+        <li><a href="index.html">Home</a></li>
+        <li>
+          <a href="#">PDF Tools ▾</a>
+          <div class="submenu">
+            <a href="#">PDF Compressor</a>
+            <a href="#">PDF Editor</a>
+            <a href="#">PDF to Image</a>
+            <a href="#">PDF to Word</a>
+            <a href="#">PDF to Excel</a>
+          </div>
+        </li>
+        <li>
+          <a href="#">Excel Tools ▾</a>
+          <div class="submenu">
+            <a href="xls-to-xlsx.html">XLS to XLSX</a>
+            <a href="#">Excel to PDF</a>
+          </div>
+        </li>
+        <li>
+          <a href="#">Image Tools ▾</a>
+          <div class="submenu">
+            <a href="img-compress.html">Image Compressor</a>
+            <a href="#">Image to PDF</a>
+            <a href="#">Image Editor</a>
+          </div>
+        </li>
+      </ul>
+      <div class="spacer"></div>
+      <button id="modeToggle" class="toggle" type="button">🌙 Dark</button>
+    </nav>
+  </header>
+
+  <main>
+    <div class="card">
+      <h1 style="margin:0 0 8px 0">XLS to XLSX Converter</h1>
+      <p class="muted">Convert legacy Excel <code>.xls</code> files into modern <code>.xlsx</code> format directly in your browser. No upload needed, works securely offline.</p>
+
+      <div id="drop" class="drop" tabindex="0" aria-label="Drop .xls files here or click to browse">
+        <strong>Drop .xls files here</strong>
+        <div style="margin-top:6px">or <button id="browseBtn" class="primary" type="button">Browse</button></div>
+        <input id="fileInput" type="file" accept=".xls" hidden multiple>
+      </div>
+
+      <div id="results" class="results"></div>
+    </div>
+  </main>
+
+  <footer>© <span id="year"></span> Office Tools</footer>
+
+  <script>
+    // ------- Theme boot + toggle -------
+    (function(){
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const saved = localStorage.getItem('theme');
+      const initial = saved || (prefersDark ? 'dark' : 'light');
+      const root = document.documentElement;
+      const btn = document.getElementById('modeToggle');
+      function apply(theme){
+        root.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        btn.textContent = theme === 'dark' ? '☀️ Light' : '🌙 Dark';
+      }
+      apply(initial);
+      btn.addEventListener('click', () => {
+        const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        apply(next);
+      });
+      document.getElementById('year').textContent = new Date().getFullYear();
+    })();
+
+    // ------- Elements -------
+    const drop = document.getElementById('drop');
+    const fileInput = document.getElementById('fileInput');
+    const browseBtn = document.getElementById('browseBtn');
+    const results = document.getElementById('results');
+
+    // ------- Drag & Drop + Browse -------
+    function highlight(on){ drop.classList.toggle('drag', !!on); }
+    ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev, e=>{e.preventDefault();highlight(true);}));
+    ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev, e=>{e.preventDefault();highlight(false);}));
+
+    drop.addEventListener('drop', e=>{
+      e.preventDefault();
+      handleFiles(e.dataTransfer.files);
+    });
+
+    browseBtn.addEventListener('click', ()=> { fileInput.value = ""; fileInput.click(); });
+    drop.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' ') fileInput.click(); });
+    fileInput.addEventListener('change', e=> handleFiles(e.target.files));
+
+    // ------- Handle Files -------
+    function handleFiles(list){
+      const arr = Array.from(list).filter(f => f.name.toLowerCase().endsWith('.xls'));
+      if(!arr.length){ alert("Please select only .xls files"); return; }
+      results.innerHTML = "";
+      arr.forEach(file => convertXls(file));
+    }
+
+    // ------- XLS to XLSX Conversion -------
+    function convertXls(file){
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const wb = XLSX.read(data, {type:'array'});
+          const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
+          const blob = new Blob([wbout], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+          const url = URL.createObjectURL(blob);
+
+          const wrap = document.createElement('div'); wrap.className='pair';
+          const colL = document.createElement('div'); colL.className='col';
+          const colR = document.createElement('div'); colR.className='col';
+
+          const oTitle = document.createElement('h3'); oTitle.textContent = 'Original';
+          const oMeta = document.createElement('div'); oMeta.className='meta';
+          oMeta.textContent = `${file.name} — ${(file.size/1024).toFixed(1)} KB`;
+
+          const cTitle = document.createElement('h3'); cTitle.textContent = 'Converted';
+          const cMeta = document.createElement('div'); cMeta.className='meta';
+          cMeta.textContent = `${file.name.replace(/\.xls$/i,'.xlsx')} — ${(blob.size/1024).toFixed(1)} KB`;
+          
+          const prog = document.createElement('div'); prog.className='progress';
+          const dl = document.createElement('a');
+          dl.className='download';
+          dl.textContent='Download XLSX';
+          dl.href=url;
+          dl.download=file.name.replace(/\.xls$/i,'.xlsx');
+
+          colL.append(oTitle, oMeta);
+          colR.append(cTitle, cMeta, dl, prog);
+          wrap.append(colL,colR);
+          results.appendChild(wrap);
+          
+          prog.style.display = 'none';
+          dl.style.display='inline-block';
+          
+        } catch(err) {
+          alert("Conversion failed: " + err.message);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  </script>
+</body>
+</html>

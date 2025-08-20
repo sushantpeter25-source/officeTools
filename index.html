@@ -1,182 +1,363 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Online Tools — Image & PDF Utilities</title>
-  <meta name="description" content="Free online tools for image and PDF processing. Compress, convert, merge, and edit files instantly in your browser." />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Office Tools - Free PDF, Excel & Image Converters</title>
+  <meta name="description" content="Office Tools - Free online tools to compress images, convert PDF to Word/Excel, Excel to PDF, Image to PDF, and more. Mobile-friendly and SEO optimized.">
+  <meta name="keywords" content="PDF Tools, Image Tools, Excel Tools, PDF Converter, Image Compressor, Office Tools">
+  <meta name="robots" content="index, follow">
+
   <style>
+    /* Custom CSS from the provided snippets for a consistent look and feel */
     :root {
-      --primary: #0066ff;
-      --secondary: #f5f8ff;
-      --text-dark: #1f2937;
-      --text-light: #6b7280;
-      --radius: 12px;
+      --bg:#ffffff;
+      --card:#f9fafb;
+      --text:#111827;
+      --muted:#6b7280;
+      --border:#e5e7eb;
+      --surface:#ffffff;
+      --primary:#0b84ff;
+      --shadow:0 4px 10px rgba(0,0,0,.05);
     }
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    [data-theme="dark"] {
+      --bg:#0b0f15;
+      --card:#0e141c;
+      --text:#f1f5f9;
+      --muted:#cbd5e1;
+      --border:#1c2530;
+      --surface:#0b1119;
+      --shadow:0 10px 30px rgba(0,0,0,.6);
     }
+    * { box-sizing: border-box; }
     body {
-      font-family: 'Inter', sans-serif;
-      background: #fff;
-      color: var(--text-dark);
-      line-height: 1.5;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
     }
+    a { color: inherit; text-decoration: none; }
+
+    /* Header & Navigation */
     header {
-      background: var(--primary);
-      color: #fff;
-      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+    .nav {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: .7rem 1rem;
     }
-    header h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-    nav a {
+    .brand-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: var(--primary);
+      display: grid;
+      place-items: center;
       color: #fff;
-      text-decoration: none;
-      margin-left: 1rem;
-      font-weight: 500;
+      font-weight: 800;
+    }
+    .brand-name {
+      font-weight: 800;
+      font-size: 1.05rem;
+    }
+    .menu {
+      display: none; /* Hidden on mobile */
+      gap: 10px;
+      align-items: center;
+    }
+    .menu > li {
+      list-style: none;
+      position: relative;
+    }
+    .menu > li > a {
+      padding: .55rem .8rem;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .menu > li:hover > a {
+      background: rgba(11, 132, 255, .08);
+    }
+    .submenu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      min-width: 220px;
+      max-height: 60vh;
+      overflow: auto;
+    }
+    .submenu a {
+      display: block;
+      padding: .6rem .9rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .submenu a:last-child {
+      border-bottom: none;
+    }
+    .menu > li:hover .submenu {
+      display: block;
+    }
+    .toggle {
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      padding: .45rem .8rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    /* Mobile nav */
+    .mobile-nav-toggle {
+      display: block; /* Show on mobile */
+      font-size: 1.5rem;
+      background: none;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .nav-menu-mobile {
+      display: flex;
+      flex-direction: column;
+      background: var(--card);
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      border-top: 1px solid var(--border);
+      padding: 1rem;
+      gap: 10px;
+      transform: translateY(-100%);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+    .nav-menu-mobile.show {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: all;
+    }
+    .nav-menu-mobile a {
+      padding: .7rem 1rem;
+      border-radius: 8px;
+      background: var(--bg);
+    }
+    
+    /* Main Content & Tools Grid */
+    main {
+      max-width: 1200px;
+      margin: 1.5rem auto;
+      padding: 0 1rem;
     }
     .hero {
-      background: var(--secondary);
-      padding: 3rem 2rem;
       text-align: center;
+      padding: 2rem 0;
     }
-    .hero h2 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
+    .hero h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin: 0;
     }
     .hero p {
-      max-width: 600px;
-      margin: 0 auto 2rem;
-      color: var(--text-light);
+      font-size: 1.1rem;
+      color: var(--muted);
+      margin-top: 0.5rem;
     }
-    .tools-section {
-      max-width: 1200px;
-      margin: 2rem auto;
-      padding: 0 1rem;
+    .tools-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 1.5rem;
-    }
-    .tool-card {
-      background: #fff;
-      border-radius: var(--radius);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-      padding: 1.5rem;
-      text-align: center;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .tool-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-    }
-    .tool-card img {
-      width: 60px;
-      height: 60px;
-      margin-bottom: 1rem;
-    }
-    .tool-card h3 {
-      margin-bottom: 0.5rem;
-      font-size: 1.2rem;
-    }
-    .tool-card p {
-      color: var(--text-light);
-      font-size: 0.95rem;
-      margin-bottom: 1rem;
-    }
-    .tool-card a {
-      display: inline-block;
-      background: var(--primary);
-      color: #fff;
-      padding: 0.5rem 1rem;
-      border-radius: var(--radius);
-      text-decoration: none;
-      font-size: 0.9rem;
-      transition: background 0.2s ease;
-    }
-    .tool-card a:hover {
-      background: #004fcc;
-    }
-    footer {
-      text-align: center;
-      padding: 1.5rem;
-      background: var(--secondary);
-      color: var(--text-light);
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       margin-top: 2rem;
-      font-size: 0.9rem;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    .card h3 {
+      font-size: 1.25rem;
+      margin: 0 0 0.5rem 0;
+    }
+    .card p {
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Footer */
+    footer {
+      padding: 20px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    /* Media Queries for Responsiveness */
+    @media (min-width: 768px) {
+      .mobile-nav-toggle {
+        display: none;
+      }
+      .menu {
+        display: flex;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- HEADER -->
   <header>
-    <h1>My Online Tools</h1>
-    <nav>
-      <a href="#">Home</a>
-      <a href="#">Image Tools</a>
-      <a href="#">PDF Tools</a>
-      <a href="#">Contact</a>
+    <nav class="nav">
+      <div class="brand">
+        <div class="brand-badge">OT</div>
+        <div class="brand-name">Office Tools</div>
+      </div>
+      <ul id="navMenu" class="menu">
+        <li><a href="#">Home</a></li>
+        <li>
+          <a href="#">PDF Tools ▾</a>
+          <div class="submenu">
+            <a href="pdf-compressor.html">PDF Compressor</a>
+            <a href="#">PDF Editor</a>
+            <a href="#">PDF to Image</a>
+            <a href="#">PDF to Word</a>
+            <a href="#">PDF to Excel</a>
+          </div>
+        </li>
+        <li>
+          <a href="#">Excel Tools ▾</a>
+          <div class="submenu">
+            <a href="/xls-to-xlsx.html">XLS to XLSX</a>
+            <a href="#">Excel to PDF</a>
+          </div>
+        </li>
+        <li>
+          <a href="#">Image Tools ▾</a>
+          <div class="submenu">
+            <a href="img-compress.html">Image Compressor</a>
+            <a href="#">Image to PDF</a>
+            <a href="#">Image Editor</a>
+          </div>
+        </li>
+      </ul>
+      <div style="flex:1"></div>
+      <button id="modeToggle" class="toggle" type="button">🌙 Dark</button>
+      <button id="menuToggle" class="mobile-nav-toggle" aria-label="Toggle navigation menu">☰</button>
     </nav>
+    <!-- Mobile Navigation Menu (hidden by default) -->
+    <ul id="navMenuMobile" class="nav-menu-mobile">
+        <li><a href="#">Home</a></li>
+        <li><a href="pdf-compressor.html">PDF Compressor</a></li>
+        <li><a href="#">PDF Editor</a></li>
+        <li><a href="#">PDF to Image</a></li>
+        <li><a href="#">PDF to Word</a></li>
+        <li><a href="#">PDF to Excel</a></li>
+        <li><a href="xls-to-xlsx.html">XLS to XLSX</a></li>
+        <li><a href="#">Excel to PDF</a></li>
+        <li><a href="img-compress.html">Image Compressor</a></li>
+        <li><a href="#">Image to PDF</a></li>
+        <li><a href="#">Image Editor</a></li>
+    </ul>
   </header>
 
-  <section class="hero">
-    <h2>All-in-One Image & PDF Tools</h2>
-    <p>Compress, convert, merge, and edit images and PDFs quickly — all in your browser with a simple, user-friendly interface.</p>
-  </section>
+  <!-- MAIN -->
+  <main>
+    <div class="hero">
+      <h1>Free online tools for all your office needs.</h1>
+      <p>Compress, convert, and edit PDFs, Excel sheets, and images directly in your browser.</p>
+    </div>
 
-  <section class="tools-section">
-    
-      <a href="/officeTools/img-compress.html" class="tool-card" style="text-decoration:none; color:inherit;">
-      <img src="https://img.icons8.com/color/96/compress.png" alt="Image Compressor" />
-      <h3>Image Compressor</h3>
-      <p>Reduce image file sizes while keeping high quality for faster load times.</p>
+    <div class="tools-grid">
+      <!-- These links are now clickable, fixing the previous issue. -->
+      <a href="img-compress.html" style="text-decoration: none; color: inherit;">
+        <div class="card">
+          <h3>Image Compressor</h3>
+          <p>Reduce image size while keeping quality. Best for web optimization.</p>
+        </div>
       </a>
+      <a href="#" style="text-decoration: none; color: inherit;">
+        <div class="card">
+          <h3>PDF to Word</h3>
+          <p>Convert your PDF documents into editable Word files instantly.</p>
+        </div>
+      </a>
+      <a href="#" style="text-decoration: none; color: inherit;">
+        <div class="card">
+          <h3>Excel to PDF</h3>
+          <p>Save Excel sheets as high-quality PDFs easily.</p>
+        </div>
+      </a>
+      <a href="/xls-to-xlsx.html" style="text-decoration: none; color: inherit;">
+        <div class="card">
+          <h3>xls to xlsx</h3>
+          <p>Convert office 2003 excel file to office 2007 excel file.</p>
+        </div>
+      </a>
+	   <a href="/pdf-compressor.html" style="text-decoration: none; color: inherit;">
+        <div class="card">
+          <h3>PDF Compressor</h3>
+          <p>Compress PDF file to smaller size.</p>
+        </div>
+      </a>
+    </div>
 
-    <div class="tool-card">
-      <img src="https://img.icons8.com/color/96/convert.png" alt="Image Converter" />
-      <h3>Image Converter</h3>
-      <p>Convert images between formats like JPEG, PNG, and WebP easily.</p>
-      <a href="image-converter.html">Try Now</a>
+    <!-- Adsense placeholder -->
+    <div style="margin:2rem 0;text-align:center;">
+      <div style="border:1px dashed var(--border); padding:1rem; border-radius:8px;">
+        AdSense Placeholder
+      </div>
     </div>
-    <div class="tool-card">
-      <img src="https://img.icons8.com/color/96/pdf.png" alt="PDF Merger" />
-      <h3>PDF Merger</h3>
-      <p>Combine multiple PDF files into one seamless document.</p>
-      <a href="pdf-merger.html">Try Now</a>
-    </div>
-    <div class="tool-card">
-      <img src="https://img.icons8.com/color/96/split-files.png" alt="PDF Splitter" />
-      <h3>PDF Splitter</h3>
-      <p>Split a large PDF into smaller, easy-to-manage files.</p>
-      <a href="pdf-splitter.html">Try Now</a>
-    </div>
-    <div class="tool-card">
-      <img src="https://img.icons8.com/color/96/resize.png" alt="Image Resizer" />
-      <h3>Image Resizer</h3>
-      <p>Resize images to custom dimensions without losing quality.</p>
-      <a href="image-resizer.html">Try Now</a>
-    </div>
-    <div class="tool-card">
-      <img src="https://img.icons8.com/color/96/edit-image.png" alt="Image Editor" />
-      <h3>Image Editor</h3>
-      <p>Edit images online with filters, crop, and annotations.</p>
-      <a href="image-editor.html">Try Now</a>
-    </div>
-  </section>
+  </main>
 
+  <!-- FOOTER -->
   <footer>
-    &copy; <span id="year"></span> My Online Tools. All rights reserved.
+    &copy; <span id="year"></span> Office Tools. All rights reserved.
   </footer>
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Dark mode toggle and persistence
+    const modeToggle = document.getElementById('modeToggle');
+    function setTheme(theme){
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+      modeToggle.textContent = theme === 'dark' ? '☀️ Light' : '🌙 Dark';
+    }
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+    modeToggle.addEventListener('click', ()=>{
+      const current = document.documentElement.getAttribute('data-theme');
+      setTheme(current === 'dark' ? 'light' : 'dark');
+    });
+
+    // Mobile nav toggle
+    const menuToggle = document.getElementById('menuToggle');
+    const navMenuMobile = document.getElementById('navMenuMobile');
+    menuToggle.addEventListener('click', () => navMenuMobile.classList.toggle('show'));
   </script>
 </body>
 </html>
