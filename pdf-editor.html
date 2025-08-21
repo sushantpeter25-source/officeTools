@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PDF Editor — Office Tools</title>
+  <meta name="description" content="Edit PDF: rearrange pages, delete pages, clear all and save edited PDF. Secure client-side processing.">
+  <meta name="keywords" content="PDF editor, rearrange PDF, delete PDF pages, edit PDF">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="PDF Editor.">
+  <meta property="og:description" content="Edit PDF file, delete page, rearrange pages.">
+  <meta property="og:type" content="website">
+
+  <style>
+    :root{
+      --accent:#0b84ff;
+      --bg:#ffffff;
+      --card:#ffffff;
+      --text:#111111;
+      --muted:#566173;
+      --border:#e5e7eb;
+      --shadow:0 8px 24px rgba(10,20,40,.08);
+      --menu-bg:#ffffff;
+      --success:#22c55e;
+      --warning:#f59e0b;
+      --error:#ef4444;
+    }
+    [data-theme="dark"]{
+      --bg:#0b0f15;
+      --card:#0e141c;
+      --text:#f1f5f9;
+      --muted:#cbd5e1;
+      --border:#1f2a37;
+      --shadow:0 18px 40px rgba(0,0,0,.55);
+      --menu-bg:#101823;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);}
+    a{color:inherit;text-decoration:none}
+    header{position:sticky;top:0;z-index:1000;background:var(--card);box-shadow:var(--shadow)}
+    .nav{display:flex;align-items:center;justify-content:space-between;max-width:1200px;margin:0 auto;padding:.7rem 1rem;gap:12px}
+    .brand{display:flex;align-items:center;gap:10px}
+    .brand-badge{width:36px;height:36px;border-radius:9px;background:var(--accent);display:grid;place-items:center;color:#fff;font-weight:800}
+    .brand-name{font-weight:800;font-size:1.05rem}
+    .menu{display:flex;gap:10px;align-items:center}
+    .menu > li{list-style:none;position:relative}
+    .menu > li > a{padding:.55rem .8rem;border-radius:8px;display:flex;align-items:center;gap:6px}
+    .menu > li:hover > a{background:rgba(11,132,255,.08)}
+    .submenu{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--menu-bg);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);min-width:220px;max-height:60vh;overflow:auto;z-index:1001}
+    .submenu a{display:block;padding:.6rem .9rem;border-bottom:1px solid rgba(0,0,0,.04)}
+    .submenu a:last-child{border-bottom:none}
+    .menu > li:hover .submenu{display:block}
+    .spacer{flex:1}
+    .toggle{border:1px solid var(--border);background:transparent;color:var(--text);padding:.45rem .8rem;border-radius:8px;cursor:pointer}
+    main{max-width:1200px;margin:1.5rem auto;padding:0 1rem}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:24px;margin-bottom:1.5rem}
+    .drop{border:2px dashed var(--border);border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:.15s;background:transparent}
+    .drop.drag{background:rgba(11,132,255,.07);border-color:var(--accent)}
+    .drop:hover{background:rgba(11,132,255,.03)}
+    .actions{margin:20px 0;display:flex;gap:16px}
+    .primary{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:.65rem 1.2rem;cursor:pointer;font-weight:500;transition:.2s}
+    .primary:hover{background:#0066cc}
+    .primary:disabled{background:var(--muted);cursor:not-allowed}
+    .secondary{background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:8px;padding:.6rem 1.2rem;cursor:pointer;font-weight:500;transition:.2s}
+    .secondary:hover{background:rgba(11,132,255,.08)}
+    #pages{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}
+    .page{border:1px solid var(--border);padding:10px;border-radius:8px;text-align:center;width:140px}
+    .page img{max-width:100%;border-radius:4px}
+    .page button{margin-top:6px;background:#ef4444;color:#fff;border:none;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:.8rem}
+    .page button:hover{background:#dc2626}
+    footer{padding:20px;text-align:center;color:var(--muted);border-top:1px solid var(--border)}
+    @media (max-width: 768px) {
+      .menu{display:none}
+      .actions{flex-direction:column}
+      .page{width:100%}
+    }
+  </style>
+</head>
+<body>
+ <header>
+    <nav class="nav">
+      <div class="brand">
+        <div class="brand-badge">OT</div>
+        <div class="brand-name">Office Tools</div>
+      </div>
+      <ul class="menu">
+        <li><a href="index.html">Home</a></li>
+        <li>
+          <a href="#">PDF Tools ▾</a>
+          <div class="submenu">
+            <a href="pdf-compressor.html">PDF Compressor</a>
+            <a href="pdf-editor.html">PDF Editor</a>
+            <a href="#">PDF to Image</a>
+            <a href="#">PDF to Word</a>
+            <a href="#">PDF to Excel</a>
+          </div>
+        </li>
+        <li>
+          <a href="#">Excel Tools ▾</a>
+          <div class="submenu">
+            <a href="#">Excel to PDF</a>
+            <a href="/xls-to-xlsx.html">XLS to XLSX</a>
+          </div>
+        </li>
+        <li>
+          <a href="#">Image Tools ▾</a>
+          <div class="submenu">
+            <a href="img-compress.html">Image Compressor</a>
+            <a href="#">Image to PDF</a>
+            <a href="#">Image Editor</a>
+          </div>
+        </li>
+      </ul>
+      <div class="spacer"></div>
+      <button id="modeToggle" class="toggle" type="button">🌙 Dark</button>
+    </nav>
+  </header>
+
+  <main>
+    <h1>PDF Editor</h1>
+    <p>Upload a PDF, rearrange or delete pages, clear all, and save the edited PDF. All processing is done in your browser.</p>
+    
+    <div id="drop" class="drop">
+      <strong>Drop PDF file here</strong><br>or<br>
+      <button id="browseBtn" class="primary" type="button">Browse Files</button>
+      <input id="fileInput" type="file" accept="application/pdf" hidden>
+    </div>
+
+    <div id="pages"></div>
+
+    <div class="actions">
+      <button id="saveBtn" class="primary" type="button" disabled>Save Edited PDF</button>
+      <button id="clearBtn" class="secondary" type="button" disabled>Clear All</button>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; <span id="year"></span> Office Tools. PDF Editor.</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script>
+    // Theme toggle
+    (function(){
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const saved = localStorage.getItem('theme');
+      const initial = saved || (prefersDark ? 'dark' : 'light');
+      const root = document.documentElement;
+      const btn = document.getElementById('modeToggle');
+      function apply(theme){
+        root.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        btn.textContent = theme === 'dark' ? '☀️ Light' : '🌙 Dark';
+      }
+      apply(initial);
+      btn.addEventListener('click', () => {
+        const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        apply(next);
+      });
+      document.getElementById('year').textContent = new Date().getFullYear();
+    })();
+
+    const drop = document.getElementById('drop');
+    const fileInput = document.getElementById('fileInput');
+    const browseBtn = document.getElementById('browseBtn');
+    const pagesContainer = document.getElementById('pages');
+    const saveBtn = document.getElementById('saveBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    let pdfDoc = null;
+    let pageOrder = [];
+    let uploadedFile = null;
+
+    browseBtn.onclick = ()=> fileInput.click();
+    fileInput.onchange = e=> handleFile(e.target.files[0]);
+
+    drop.ondragover = e=>{ e.preventDefault(); drop.classList.add('drag'); };
+    drop.ondragleave = ()=> drop.classList.remove('drag');
+    drop.ondrop = e=>{
+      e.preventDefault(); drop.classList.remove('drag');
+      handleFile(e.dataTransfer.files[0]);
+    };
+	
+	async function handleFile(file){
+      if(!file || file.type!=='application/pdf'){alert('Please upload a PDF file');return;}
+      uploadedFile = file;
+      const arrayBuffer = await file.arrayBuffer();
+      pdfDoc = await pdfjsLib.getDocument({data:arrayBuffer}).promise;
+      pageOrder = Array.from({length: pdfDoc.numPages}, (_,i)=>i+1);
+      renderPages();
+      saveBtn.disabled=false;
+      clearBtn.disabled=false;
+    }
+	
+	
+
+    async function renderPages(){
+  pagesContainer.innerHTML='';
+  for(const pageNum of pageOrder){
+    const page = await pdfDoc.getPage(pageNum);
+    const viewport = page.getViewport({scale:0.25});
+    const canvas = document.createElement('canvas');
+    canvas.width=viewport.width; canvas.height=viewport.height;
+    await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
+
+    const div=document.createElement('div');
+    div.className='page';
+    div.dataset.page=pageNum;
+
+    div.innerHTML = `
+      <img src="${canvas.toDataURL()}"><br>
+      <div style="margin-top:6px;display:flex;gap:4px;justify-content:center;">
+        <button class="move-left">⬅️</button>
+        <button class="move-right">➡️</button>
+        <button class="delete">🗑️</button>
+      </div>
+    `;
+
+    // Delete
+    div.querySelector('.delete').onclick=()=>{ 
+      pageOrder=pageOrder.filter(p=>p!==pageNum); 
+      renderPages(); 
+    };
+
+    // Move Left
+    div.querySelector('.move-left').onclick=()=>{
+      const idx=pageOrder.indexOf(pageNum);
+      if(idx>0){
+        [pageOrder[idx-1],pageOrder[idx]]=[pageOrder[idx],pageOrder[idx-1]];
+        renderPages();
+      }
+    };
+
+    // Move Right
+    div.querySelector('.move-right').onclick=()=>{
+      const idx=pageOrder.indexOf(pageNum);
+      if(idx<pageOrder.length-1){
+        [pageOrder[idx],pageOrder[idx+1]]=[pageOrder[idx+1],pageOrder[idx]];
+        renderPages();
+      }
+    };
+
+    pagesContainer.appendChild(div);
+  }
+}
+
+    
+
+    function enableDragSort(){
+      let dragSrc=null;
+      document.querySelectorAll('.page').forEach(el=>{
+        el.addEventListener('dragstart',e=>{
+          dragSrc=el; e.dataTransfer.effectAllowed='move';
+        });
+        el.addEventListener('dragover',e=>{
+          e.preventDefault(); e.dataTransfer.dropEffect='move';
+        });
+        el.addEventListener('drop',e=>{
+          e.preventDefault();
+          if(dragSrc && dragSrc!==el){
+            const from=pageOrder.indexOf(+dragSrc.dataset.page);
+            const to=pageOrder.indexOf(+el.dataset.page);
+            pageOrder.splice(to,0,...pageOrder.splice(from,1));
+            renderPages();
+          }
+        });
+      });
+    }
+
+    saveBtn.onclick=async ()=>{
+      if(!uploadedFile) return;
+      const origBytes = await uploadedFile.arrayBuffer();
+      const origDoc = await PDFLib.PDFDocument.load(origBytes);
+      const newDoc = await PDFLib.PDFDocument.create();
+      for(const num of pageOrder){
+        const [p] = await newDoc.copyPages(origDoc,[num-1]);
+        newDoc.addPage(p);
+      }
+      const pdfBytes = await newDoc.save();
+      const blob=new Blob([pdfBytes],{type:'application/pdf'});
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download='edited.pdf';
+      a.click();
+    };
+
+    clearBtn.onclick=()=>{
+      pdfDoc=null;
+      uploadedFile=null;
+      pageOrder=[];
+      pagesContainer.innerHTML='';
+      saveBtn.disabled=true;
+      clearBtn.disabled=true;
+    };
+  </script>
+</body>
+</html>
