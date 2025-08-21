@@ -107,7 +107,7 @@
           <div class="submenu">
             <a href="img-compress.html">Image Compressor</a>
             <a href="#">Image to PDF</a>
-            <a href="#">Image Editor</a>
+            <a href="img-editor.html">Image Editor</a>
           </div>
         </li>
       </ul>
@@ -118,7 +118,23 @@
 
   <main>
     <h1>PDF Editor</h1>
-    <p>Upload a PDF, rearrange or delete pages, clear all, and save the edited PDF. All processing is done in your browser.</p>
+	<p>Upload a PDF, rearrange or delete pages and save the edited PDF. All processing is done in your browser.</p>
+		<div class="card" style="margin:1rem 0;">
+		  <h2 style="margin-top:0;">📘 How to Use</h2>
+		  <ol style="line-height:1.6;">
+			<li><strong>Upload:</strong> Drag & Drop your PDF file or click <em>Browse Files</em> button.</li>
+			<li><strong>Preview Pages:</strong> All pages will appear as thumbnails below.</li>
+			<li><strong>Delete:</strong> Click the 🗑️ button under a page to remove it.</li>
+			<li><strong>Rearrange (Small PDFs):</strong> Use ⬅️ and ➡️ buttons to move a page left or right step by step.</li>
+			<li><strong>Rearrange (Large PDFs):</strong> Use the <em>“Move to”</em> box under a page to directly place it at a specific position (e.g., Move to 1 = first page).</li>
+			<li><strong>                      :</strong> Use keyboard to enter desired page number in the box, because clicking on up/down arrow will instantly reload the thumbnail with changes.</li>
+			<li><strong>Save:</strong> When finished, click <em>Save Edited PDF</em> to download your new file.</li>
+			<li><strong>Clear:</strong> Use <em>Clear All</em> to remove the current PDF and start again.</li>
+		  </ol>
+		  <p style="font-size:0.9rem;color:gray;">💡 Tip: For large documents, the <em>Move to</em> box is the fastest way to reorder pages.</p>
+		</div>
+
+    
     
     <div id="drop" class="drop">
       <strong>Drop PDF file here</strong><br>or<br>
@@ -210,10 +226,16 @@
 
     div.innerHTML = `
       <img src="${canvas.toDataURL()}"><br>
-      <div style="margin-top:6px;display:flex;gap:4px;justify-content:center;">
+      <div style="margin-top:6px;display:flex;gap:4px;justify-content:center;flex-wrap:wrap;">
         <button class="move-left">⬅️</button>
         <button class="move-right">➡️</button>
         <button class="delete">🗑️</button>
+      </div>
+      <div style="margin-top:6px;text-align:center;">
+        <label style="font-size:0.8rem;color:gray;">Move to:</label>
+        <input type="number" min="1" max="${pageOrder.length}" 
+               value="${pageOrder.indexOf(pageNum)+1}" 
+               class="move-to" style="width:60px;text-align:center;">
       </div>
     `;
 
@@ -240,6 +262,16 @@
         renderPages();
       }
     };
+
+    // Move to Position (fast jump)
+    div.querySelector('.move-to').addEventListener('change',e=>{
+      let target=parseInt(e.target.value);
+      if(isNaN(target) || target<1 || target>pageOrder.length) return;
+      const oldIndex=pageOrder.indexOf(pageNum);
+      pageOrder.splice(oldIndex,1);         // remove from old
+      pageOrder.splice(target-1,0,pageNum); // insert new
+      renderPages();
+    });
 
     pagesContainer.appendChild(div);
   }
