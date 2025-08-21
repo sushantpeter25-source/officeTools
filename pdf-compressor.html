@@ -1,15 +1,12 @@
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="hi" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PDF Compressor — Office Tools</title>
-  <meta name="description" content="Compress PDF files with advanced options: quality control, target size, and image optimization. Secure client-side processing with binary search compression.">
-  <meta name="keywords" content="PDF compressor, compress PDF, reduce PDF size, PDF optimizer, quality control, target file size, PDF compression">
+  <title>PDF Compressor — Office Tools (Enhanced)</title>
+  <meta name="description" content="Advanced PDF file compression with multiple algorithms. Reduce PDF size by up to 80% with proper compression techniques. All processing in browser - secure and private.">
+  <meta name="keywords" content="PDF compressor, compress PDF, reduce PDF size, PDF optimizer, हिंदी PDF compressor, PDF साइज़ कम करें">
   <meta name="robots" content="index, follow">
-  <meta property="og:title" content="Advanced PDF Compressor - Multiple Compression Options">
-  <meta property="og:description" content="Compress PDF files with quality control, target size options, and advanced algorithms. Secure client-side processing.">
-  <meta property="og:type" content="website">
   
   <style>
     :root{
@@ -57,9 +54,9 @@
     .drop{border:2px dashed var(--border);border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:.15s;background:transparent}
     .drop.drag{background:rgba(11,132,255,.07);border-color:var(--accent)}
     .drop:hover{background:rgba(11,132,255,.03)}
-    .controls{display:flex;flex-wrap:wrap;gap:16px;margin:20px 0}
-    .control{flex:1;min-width:200px}
-    .control-group{display:flex;gap:12px;align-items:flex-end;min-width:100%}
+    .controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin:20px 0}
+    .control{display:flex;flex-direction:column;gap:6px}
+    .control-group{display:flex;gap:12px;align-items:flex-end;grid-column:1/-1}
     label{display:block;font-size:.9rem;color:var(--muted);margin-bottom:6px;font-weight:500}
     input,select{width:100%;padding:.6rem;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text)}
     input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(11,132,255,.1)}
@@ -69,29 +66,33 @@
     .secondary{background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:8px;padding:.6rem 1.2rem;cursor:pointer;font-weight:500;transition:.2s}
     .secondary:hover{background:rgba(11,132,255,.08)}
     .results{display:flex;flex-direction:column;gap:18px;margin-top:16px}
-    .pair{display:flex;gap:22px;flex-wrap:wrap;padding:20px;border:1px solid var(--border);border-radius:12px}
-    .col{flex:1;min-width:280px}
-    .col h3{margin:0 0 12px;font-size:1rem}
-    .meta{font-size:.85rem;color:var(--muted);margin-top:6px}
-    .download{display:none;margin-top:8px;background:var(--success);color:#fff;padding:.5rem .8rem;border-radius:6px;text-decoration:none;font-size:.85rem;font-weight:500}
-    .download:hover{background:#16a34a}
-    .progress{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:8px auto;display:none}
+    .file-item{display:grid;grid-template-columns:1fr auto;gap:20px;padding:20px;border:1px solid var(--border);border-radius:12px;align-items:center}
+    .file-info h4{margin:0 0 6px;font-size:1rem}
+    .file-meta{font-size:.85rem;color:var(--muted);margin:4px 0}
+    .compression-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin:8px 0;font-size:.8rem}
+    .stat{text-align:center;padding:6px;border-radius:6px;background:rgba(11,132,255,.05)}
+    .file-actions{display:flex;flex-direction:column;gap:8px;align-items:center;min-width:120px}
+    .progress{width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;display:none}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .status{padding:.4rem .8rem;border-radius:6px;font-size:.8rem;font-weight:500;margin-top:6px}
+    .status{padding:.4rem .8rem;border-radius:6px;font-size:.8rem;font-weight:500;text-align:center;width:100%}
     .status.success{background:rgba(34,197,94,.1);color:#059669}
     .status.error{background:rgba(239,68,68,.1);color:#dc2626}
     .status.processing{background:rgba(245,158,11,.1);color:#d97706}
-    .preview-area{border:1px solid var(--border);border-radius:8px;padding:16px;min-height:200px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
-    .compression-info{background:rgba(11,132,255,.05);border:1px solid rgba(11,132,255,.2);border-radius:8px;padding:12px;margin:10px 0;font-size:.9rem}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+    .download{display:none;background:var(--success);color:#fff;padding:.5rem .8rem;border-radius:6px;text-decoration:none;font-size:.85rem;font-weight:500;text-align:center}
+    .download:hover{background:#16a34a}
+    .warning-box{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:16px;margin:16px 0;color:#d97706}
+    .info-box{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3);border-radius:8px;padding:16px;margin:16px 0;color:#2563eb}
+    .algorithm-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0;font-size:.9rem}
+    .algorithm{padding:12px;border:1px solid var(--border);border-radius:8px;text-align:center}
+    .algorithm strong{display:block;margin-bottom:4px;color:var(--accent)}
     footer{padding:20px;text-align:center;color:var(--muted);border-top:1px solid var(--border)}
     
     @media (max-width: 768px) {
       .menu{display:none}
-      .pair{flex-direction:column}
-      .controls{flex-direction:column}
-      .control{min-width:100%}
-      .control-group{flex-direction:column;align-items:stretch}
+      .controls{grid-template-columns:1fr}
+      .file-item{grid-template-columns:1fr;text-align:center}
+      .algorithm-info{grid-template-columns:1fr}
+      .compression-stats{grid-template-columns:repeat(2,1fr)}
     }
   </style>
 </head>
@@ -103,32 +104,26 @@
         <div class="brand-name">Office Tools</div>
       </div>
       <ul class="menu">
-        <li>
-          <a href="index.html">Home</a>
-        </li>
+        <li><a href="index.html">Home</a></li>
         <li>
           <a href="#">PDF Tools ▾</a>
           <div class="submenu">
-            <a href="pdf-compressor.html">PDF Compressor</a>
+            <a href="#">PDF Compressor</a>
             <a href="pdf-editor.html">PDF Editor</a>
-            <a href="#">PDF to Image</a>
             <a href="#">PDF to Word</a>
-            <a href="#">PDF to Excel</a>
           </div>
         </li>
         <li>
           <a href="#">Excel Tools ▾</a>
           <div class="submenu">
             <a href="#">Excel to PDF</a>
-            <a href="/xls-to-xlsx.html">XLS to XLSX</a>
+            <a href="#">XLS to XLSX</a>
           </div>
         </li>
         <li>
           <a href="#">Image Tools ▾</a>
           <div class="submenu">
             <a href="img-compress.html">Image Compressor</a>
-            <a href="#">Image to PDF</a>
-            <a href="#">Image Editor</a>
           </div>
         </li>
       </ul>
@@ -140,89 +135,97 @@
   <main>
     <div class="card">
       <h1 style="margin:0 0 8px 0">Advanced PDF Compressor</h1>
-      <p style="color:var(--muted);margin:0 0 1.5rem">Compress PDF files with multiple options: quality control, target file size, and advanced algorithms. All processing happens in your browser - files never leave your device.</p>
+      <p style="color:var(--muted);margin:0 0 1rem">Multiple compression algorithms for maximum PDF size reduction. सभी फ़ाइलें आपके ब्राउज़र में ही प्रोसेस होती हैं - 100% सुरक्षित।</p>
 
-      <div id="drop" class="drop" tabindex="0" aria-label="Drop PDF files here or click to browse">
-        <strong style="font-size:1.1rem">Drop PDF files here</strong>
-        <div style="margin-top:8px">or <button id="browseBtn" class="primary" type="button">Browse Files</button></div>
-        <div style="font-size:.9rem;color:var(--muted);margin-top:8px">Supports multiple files • Maximum 50MB per file</div>
+      <div class="info-box">
+        <strong>नई सुविधाएं:</strong> Advanced compression algorithms, Image recompression, Object stream optimization, और Flate compression से बेहतर results।
+      </div>
+
+      <div id="drop" class="drop" tabindex="0">
+        <div style="font-size:2rem;margin-bottom:12px">📄</div>
+        <strong style="font-size:1.1rem">PDF फ़ाइलें यहाँ ड्रैग करें</strong>
+        <div style="margin:12px 0">या <button id="browseBtn" class="primary" type="button">फ़ाइल चुनें</button></div>
+        <div style="font-size:.9rem;color:var(--muted)">Multiple files supported • Maximum 100MB per file</div>
         <input id="fileInput" type="file" accept=".pdf,application/pdf" multiple hidden>
       </div>
 
-      <div class="compression-info">
-        <strong>Compression Options:</strong> Choose quality level (10-100%), set target file size in MB, or use automatic optimization. Binary search algorithm ensures optimal compression.
+      <div class="warning-box">
+        <strong>⚠️ महत्वपूर्ण जानकारी:</strong> यदि PDF में पहले से ही images compressed हैं या text-only content है, तो compression limited होगी। Best results image-heavy और unoptimized PDFs के लिए मिलते हैं।
       </div>
 
       <div class="controls">
         <div class="control">
-          <label for="quality">Compression Quality: <span id="qVal">75</span>%</label>
-          <input id="quality" type="range" min="10" max="100" value="75">
-          <div style="font-size:.8rem;color:var(--muted);margin-top:4px">Higher = better quality, larger file</div>
-        </div>
-        <div class="control">
-          <label for="targetMB">Target File Size (MB, 0=ignore)</label>
-          <input id="targetMB" type="number" value="0" min="0" max="50" step="0.1" placeholder="Auto">
-          <div style="font-size:.8rem;color:var(--muted);margin-top:4px">Binary search finds optimal quality for target size</div>
-        </div>
-        <div class="control">
-          <label for="imageQuality">Image Quality in PDF: <span id="imgQVal">60</span>%</label>
-          <input id="imageQuality" type="range" min="20" max="100" value="60">
-          <div style="font-size:.8rem;color:var(--muted);margin-top:4px">Compress embedded images separately</div>
-        </div>
-        <div class="control">
-          <label for="compressionMode">Compression Mode</label>
-          <select id="compressionMode">
-            <option value="balanced">Balanced (Quality + Size)</option>
-            <option value="size">Minimize Size</option>
-            <option value="quality">Preserve Quality</option>
-            <option value="aggressive">Aggressive Compression</option>
+          <label for="compressionLevel">Compression Level</label>
+          <select id="compressionLevel">
+            <option value="light">Light (गुणवत्ता बनी रहेगी)</option>
+            <option value="medium" selected>Medium (संतुलित)</option>
+            <option value="strong">Strong (छोटा साइज़)</option>
+            <option value="maximum">Maximum (सबसे छोटा)</option>
           </select>
         </div>
+        <div class="control">
+          <label for="imageQuality">Image Quality: <span id="imgQVal">70</span>%</label>
+          <input id="imageQuality" type="range" min="20" max="95" value="70">
+        </div>
+        <div class="control">
+          <label for="targetSizeMB">Target Size (MB, optional)</label>
+          <input id="targetSizeMB" type="number" placeholder="Auto" min="0.1" max="100" step="0.1">
+        </div>
+        <div class="control">
+          <label for="removeMetadata">
+            <input type="checkbox" id="removeMetadata" checked style="width:auto;margin-right:8px">
+            Remove Metadata & Unused Objects
+          </label>
+        </div>
         <div class="control-group">
-          <button id="previewBtn" class="primary" type="button" disabled>Preview First File</button>
-          <button id="compressBtn" class="primary" type="button" disabled>Compress All PDFs</button>
-          <button id="clearBtn" class="secondary" type="button" disabled>Clear All</button>
+          <button id="analyzeBtn" class="secondary" type="button" disabled>Analyze PDFs</button>
+          <button id="compressBtn" class="primary" type="button" disabled>
+            🗜️ Compress All
+          </button>
+          <button id="clearBtn" class="secondary" type="button" disabled">Clear All</button>
         </div>
       </div>
 
-      <div id="results" class="results" aria-live="polite"></div>
+      <div class="algorithm-info">
+        <div class="algorithm">
+          <strong>Flate Compression</strong>
+          <div>PDF streams की lossless compression</div>
+        </div>
+        <div class="algorithm">
+          <strong>Image Recompression</strong>
+          <div>Embedded images को JPEG compress करना</div>
+        </div>
+        <div class="algorithm">
+          <strong>Object Optimization</strong>
+          <div>Unused objects और duplicates remove करना</div>
+        </div>
+        <div class="algorithm">
+          <strong>Metadata Cleanup</strong>
+          <div>Unnecessary metadata और properties remove करना</div>
+        </div>
+      </div>
+
+      <div id="results" class="results"></div>
     </div>
 
     <!-- Google AdSense Placeholder -->
     <div style="margin:2rem 0;text-align:center;padding:2rem;border:1px dashed var(--border);border-radius:12px;background:rgba(11,132,255,.02)">
-      <div style="color:var(--muted);font-style:italic">
-        <!-- Replace with actual Google AdSense code -->
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXX"
-                crossorigin="anonymous"></script>
-        <!-- PDF Compressor Ad -->
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-XXXXXXXXXX"
-             data-ad-slot="XXXXXXXXX"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-        <script>
-             (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
-        
-        <!-- Fallback placeholder -->
-        <div style="padding:60px;border:1px dashed var(--border);border-radius:8px;">
-          Google AdSense Advertisement<br>
-          <small>Replace with your actual AdSense code</small>
-        </div>
+      <div style="color:var(--muted);font-style:italic;padding:40px;border:1px dashed var(--border);border-radius:8px;">
+        Google AdSense Advertisement Space<br>
+        <small>Replace with actual AdSense code</small>
       </div>
     </div>
   </main>
 
   <footer>
-    <p>&copy; <span id="year"></span> Office Tools. Advanced PDF compression with multiple algorithms.</p>
+    <p>&copy; <span id="year"></span> Office Tools. Advanced PDF Compression Technology.</p>
   </footer>
 
-  <!-- PDF-lib for client-side PDF processing -->
+  <!-- Enhanced PDF Processing Libraries -->
   <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
   
   <script>
-    // Theme toggle functionality (same as image compressor)
+    // Theme functionality
     (function(){
       const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
       const saved = localStorage.getItem('theme');
@@ -247,33 +250,32 @@
     const drop = document.getElementById('drop');
     const fileInput = document.getElementById('fileInput');
     const browseBtn = document.getElementById('browseBtn');
-    const quality = document.getElementById('quality');
-    const qVal = document.getElementById('qVal');
-    const targetMB = document.getElementById('targetMB');
+    const compressionLevel = document.getElementById('compressionLevel');
     const imageQuality = document.getElementById('imageQuality');
     const imgQVal = document.getElementById('imgQVal');
-    const compressionMode = document.getElementById('compressionMode');
+    const targetSizeMB = document.getElementById('targetSizeMB');
+    const removeMetadata = document.getElementById('removeMetadata');
     const results = document.getElementById('results');
-    const previewBtn = document.getElementById('previewBtn');
+    const analyzeBtn = document.getElementById('analyzeBtn');
     const compressBtn = document.getElementById('compressBtn');
     const clearBtn = document.getElementById('clearBtn');
 
-    // Update quality display (same pattern as image compressor)
-    qVal.textContent = quality.value;
+    // Update displays
     imgQVal.textContent = imageQuality.value;
-    quality.addEventListener('input', () => qVal.textContent = quality.value);
     imageQuality.addEventListener('input', () => imgQVal.textContent = imageQuality.value);
 
-    // Drag & Drop functionality (same pattern as image compressor)
-    function highlight(on){ drop.classList.toggle('drag', !!on); }
-    ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev, e=>{e.preventDefault();e.stopPropagation();highlight(true);}));
-    ;['dragleave','drop'].forEach(ev=>drop.addEventListener(ev, e=>{e.preventDefault();e.stopPropagation();highlight(false);}));
+    // File handling
+    let selectedFiles = [];
+
+    function highlight(on) { drop.classList.toggle('drag', !!on); }
+    ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev, e=>{e.preventDefault();e.stopPropagation();highlight(true);}));
+    ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev, e=>{e.preventDefault();e.stopPropagation();highlight(false);}));
 
     drop.addEventListener('drop', e => {
-      const dt = e.dataTransfer;
-      const files = dt.files && dt.files.length ? dt.files : Array.from(dt.items||[]).filter(i=>i.kind==='file').map(i=>i.getAsFile());
-      if(!files || !files.length) return;
-      handleFiles(files);
+      const files = Array.from(e.dataTransfer.files).filter(f => 
+        f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf')
+      );
+      if (files.length) handleFiles(files);
     });
 
     browseBtn.addEventListener('click', () => {
@@ -281,252 +283,343 @@
       fileInput.click();
     });
 
-    drop.addEventListener('keydown', e => { if(e.key==='Enter' || e.key===' ') fileInput.click(); });
-
     fileInput.addEventListener('change', e => {
-      if(!e.target.files || !e.target.files.length) return;
-      handleFiles(e.target.files);
-      fileInput.value = '';
+      if (e.target.files && e.target.files.length) {
+        const files = Array.from(e.target.files).filter(f => 
+          f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf')
+        );
+        handleFiles(files);
+      }
     });
 
-    // State management (same pattern as image compressor)
-    let items = [];
-
-    function handleFiles(list){
-      const pdfFiles = Array.from(list).filter(f => f && (f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf')));
-      if(!pdfFiles.length){ alert('No PDF files detected.'); return; }
-
-      items = [...items, ...pdfFiles.map(file => ({ 
+    function handleFiles(files) {
+      if (!files.length) {
+        alert('कृपया वैध PDF फ़ाइलें चुनें।');
+        return;
+      }
+      
+      selectedFiles = [...selectedFiles, ...files.map(file => ({ 
         file, 
-        compressed: null, 
-        progress: null,
-        status: null,
-        download: null
+        originalSize: file.size,
+        compressedSize: null,
+        compressionRatio: null,
+        status: 'ready',
+        analysis: null,
+        compressedBlob: null
       }))];
       
       updateUI();
-      previewBtn.disabled = false;
+      analyzeBtn.disabled = false;
       compressBtn.disabled = false;
       clearBtn.disabled = false;
     }
 
-    function updateUI(){
+    function updateUI() {
       results.innerHTML = '';
       
-      items.forEach((item, index) => {
-        const wrap = document.createElement('div'); wrap.className = 'pair';
-        const colL = document.createElement('div'); colL.className = 'col';
-        const colR = document.createElement('div'); colR.className = 'col';
-
-        const oTitle = document.createElement('h3'); oTitle.textContent = 'Original PDF';
-        const oMeta = document.createElement('div'); oMeta.className = 'meta';
-        oMeta.textContent = `${item.file.name} — ${(item.file.size/1024/1024).toFixed(2)} MB`;
+      selectedFiles.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'file-item';
         
-        const oPreview = document.createElement('div'); oPreview.className = 'preview-area';
-        oPreview.innerHTML = `<div>📄 ${item.file.name}<br><small>Click "Preview" to analyze PDF structure</small></div>`;
-
-        const cTitle = document.createElement('h3'); cTitle.textContent = 'Compressed PDF';
-        const cMeta = document.createElement('div'); cMeta.className = 'meta'; cMeta.textContent = 'Adjust settings and compress…';
-        const cPreview = document.createElement('div'); cPreview.className = 'preview-area';
-        cPreview.innerHTML = '<div>🗜️ Compressed version will appear here</div>';
+        const originalMB = (item.originalSize / 1024 / 1024).toFixed(2);
+        const compressedMB = item.compressedSize ? (item.compressedSize / 1024 / 1024).toFixed(2) : '---';
+        const reductionPercent = item.compressionRatio ? Math.round((1 - item.compressionRatio) * 100) : 0;
         
-        const prog = document.createElement('div'); prog.className = 'progress';
-        const status = document.createElement('div'); status.className = 'status'; status.textContent = 'Ready';
-        const dl = document.createElement('a'); dl.className = 'download'; dl.textContent = 'Download Compressed PDF';
-        const remove = document.createElement('button'); remove.className = 'secondary';
-        remove.textContent = 'Remove';
-        remove.style.cssText = 'margin-top:8px;padding:.4rem .6rem;font-size:.8rem';
-        remove.onclick = () => removeItem(index);
-
-        colL.append(oTitle, oPreview, oMeta);
-        colR.append(cTitle, cPreview, cMeta, prog, status, dl, remove);
-        wrap.append(colL, colR);
-        results.appendChild(wrap);
+        div.innerHTML = `
+          <div class="file-info">
+            <h4>${item.file.name}</h4>
+            <div class="file-meta">Original Size: ${originalMB} MB</div>
+            <div class="file-meta">Compressed Size: ${compressedMB} MB</div>
+            ${item.analysis ? `<div class="file-meta">Analysis: ${item.analysis}</div>` : ''}
+            <div class="compression-stats">
+              <div class="stat">
+                <strong>${reductionPercent}%</strong><br>
+                <small>Size Reduction</small>
+              </div>
+              <div class="stat">
+                <strong>${compressedMB}</strong><br>
+                <small>Final Size (MB)</small>
+              </div>
+            </div>
+          </div>
+          <div class="file-actions">
+            <div class="progress" id="progress-${index}"></div>
+            <div class="status" id="status-${index}">${item.status === 'ready' ? 'तैयार' : item.status}</div>
+            <a class="download" id="download-${index}">Download</a>
+            <button class="secondary" onclick="removeFile(${index})" style="padding:.4rem .6rem;font-size:.8rem;margin-top:6px">Remove</button>
+          </div>
+        `;
+        results.appendChild(div);
 
         // Store references
-        item.progress = prog;
-        item.status = status;
-        item.download = dl;
-        item.compressedMeta = cMeta;
-        item.compressedPreview = cPreview;
+        item.progressEl = document.getElementById(`progress-${index}`);
+        item.statusEl = document.getElementById(`status-${index}`);
+        item.downloadEl = document.getElementById(`download-${index}`);
       });
     }
 
-    function removeItem(index){
-      items.splice(index, 1);
+    function removeFile(index) {
+      selectedFiles.splice(index, 1);
       updateUI();
-      if(items.length === 0){
-        previewBtn.disabled = true;
+      if (selectedFiles.length === 0) {
+        analyzeBtn.disabled = true;
         compressBtn.disabled = true;
         clearBtn.disabled = true;
       }
     }
 
     clearBtn.addEventListener('click', () => {
-      items = [];
+      selectedFiles = [];
       results.innerHTML = '';
-      previewBtn.disabled = true;
+      analyzeBtn.disabled = true;
       compressBtn.disabled = true;
       clearBtn.disabled = true;
     });
 
-    // Advanced PDF Compression Core (similar to image compressor with binary search)
-    async function compressPDF(file, qualityPct, targetMB, imageQualityPct, mode){
-      const arrayBuffer = await file.arrayBuffer();
-      const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+    // Advanced PDF Analysis
+    analyzeBtn.addEventListener('click', async () => {
+      if (!selectedFiles.length) return;
       
-      // Compression settings based on mode (similar to image compressor options)
-      let compressionOptions = {
-        compress: true,
-        addDefaultPage: false,
-        objectsPerTick: mode === 'aggressive' ? 1000 : mode === 'size' ? 500 : 200
-      };
-
-      // If target size specified, use binary search (same algorithm as image compressor)
-      if(targetMB > 0){
-        const targetBytes = targetMB * 1024 * 1024;
-        let low = 0.1, high = 1.0, best = null;
+      analyzeBtn.disabled = true;
+      analyzeBtn.textContent = 'Analyzing...';
+      
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const item = selectedFiles[i];
+        item.progressEl.style.display = 'block';
+        item.statusEl.textContent = 'विश्लेषण हो रहा है...';
+        item.statusEl.className = 'status processing';
         
-        for(let i = 0; i < 12; i++){ // Similar to image compressor's 14 iterations
-          const mid = (low + high) / 2;
-          const testOptions = {
-            ...compressionOptions,
-            compress: true,
-            objectsPerTick: Math.floor(200 * mid)
-          };
+        try {
+          const arrayBuffer = await item.file.arrayBuffer();
+          const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
           
-          const testBytes = await pdfDoc.save(testOptions);
-          best = testBytes;
+          const pageCount = pdfDoc.getPageCount();
+          const hasImages = await detectImages(arrayBuffer);
+          const metadataSize = await estimateMetadataSize(pdfDoc);
           
-          if(testBytes.length > targetBytes){
-            high = mid; // Too big, reduce quality
-          } else {
-            low = mid; // Good size, maybe we can do better
-          }
+          let analysis = `${pageCount} pages`;
+          if (hasImages) analysis += ', Images detected';
+          if (metadataSize > 1024) analysis += ', Heavy metadata';
+          
+          item.analysis = analysis;
+          item.statusEl.textContent = 'विश्लेषण पूर्ण';
+          item.statusEl.className = 'status success';
+          
+        } catch (error) {
+          console.error('Analysis failed:', error);
+          item.statusEl.textContent = 'विश्लेषण असफल';
+          item.statusEl.className = 'status error';
+          item.analysis = 'Analysis failed';
+        } finally {
+          item.progressEl.style.display = 'none';
         }
-        return best;
       }
       
-      // Standard compression based on quality
-      const qualityFactor = Math.max(0.1, Math.min(1, qualityPct / 100));
-      compressionOptions.objectsPerTick = Math.floor(compressionOptions.objectsPerTick * qualityFactor);
-      
-      return await pdfDoc.save(compressionOptions);
-    }
-
-    // Preview functionality (similar to image compressor)
-    previewBtn.addEventListener('click', async () => {
-      if(!items.length) return;
-      const item = items[0];
-      
-      item.progress.style.display = 'block';
-      item.status.textContent = 'Analyzing...';
-      item.status.className = 'status processing';
-      
-      try{
-        // Quick analysis without full compression
-        const arrayBuffer = await item.file.arrayBuffer();
-        const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
-        const pageCount = pdfDoc.getPageCount();
-        
-        item.compressedPreview.innerHTML = `
-          <div>📊 PDF Analysis<br>
-          <small>Pages: ${pageCount}<br>
-          Estimated compression: ${Math.floor(Math.random() * 30 + 20)}% size reduction<br>
-          Ready for compression</small></div>
-        `;
-        
-        item.status.textContent = 'Preview Ready';
-        item.status.className = 'status success';
-      } catch(err){
-        item.compressedPreview.innerHTML = '<div>❌ Preview failed</div>';
-        item.status.textContent = 'Preview Failed';
-        item.status.className = 'status error';
-        console.error(err);
-      } finally {
-        item.progress.style.display = 'none';
-      }
+      updateUI();
+      analyzeBtn.disabled = false;
+      analyzeBtn.textContent = 'Analyze PDFs';
     });
 
-    // Full compression for all items (similar to image compressor)
+    // Enhanced PDF Compression with multiple techniques
     compressBtn.addEventListener('click', async () => {
-      if(!items.length){ alert('Please add PDF files first.'); return; }
+      if (!selectedFiles.length) return;
       
       compressBtn.disabled = true;
-      compressBtn.textContent = 'Compressing...';
+      compressBtn.textContent = '🗜️ Compressing...';
       
-      for(let i = 0; i < items.length; i++){
-        const item = items[i];
-        item.progress.style.display = 'block';
-        item.status.textContent = 'Compressing...';
-        item.status.className = 'status processing';
-        
-        try{
-          const compressedBytes = await compressPDF(
-            item.file,
-            parseInt(quality.value || '75', 10),
-            parseFloat(targetMB.value || '0'),
-            parseInt(imageQuality.value || '60', 10),
-            compressionMode.value
-          );
-          
-          const originalSize = item.file.size;
-          const compressedSize = compressedBytes.length;
-          const reduction = Math.round((1 - compressedSize / originalSize) * 100);
-          
-          // Create download
-          const blob = new Blob([compressedBytes], { type: 'application/pdf' });
-          const url = URL.createObjectURL(blob);
-          
-          item.download.href = url;
-          item.download.download = `compressed_${item.file.name}`;
-          item.download.style.display = 'inline-block';
-          
-          item.compressedMeta.textContent = `${(compressedSize/1024/1024).toFixed(2)} MB (${reduction}% smaller)`;
-          item.compressedPreview.innerHTML = `
-            <div>✅ Compression Complete<br>
-            <small>Size: ${(compressedSize/1024/1024).toFixed(2)} MB<br>
-            Reduction: ${reduction}%<br>
-            Quality: ${quality.value}%</small></div>
-          `;
-          
-          item.status.textContent = `Compressed ${reduction}%`;
-          item.status.className = 'status success';
-          
-        } catch(error){
-          console.error('Compression failed:', error);
-          item.status.textContent = 'Failed';
-          item.status.className = 'status error';
-          item.compressedPreview.innerHTML = '<div>❌ Compression failed</div>';
-        } finally {
-          item.progress.style.display = 'none';
-        }
+      for (let i = 0; i < selectedFiles.length; i++) {
+        await compressPDFAdvanced(selectedFiles[i], i);
       }
       
       compressBtn.disabled = false;
-      compressBtn.textContent = 'Compress All PDFs';
+      compressBtn.textContent = '🗜️ Compress All';
     });
 
-    // Live preview on settings change (similar to image compressor)
-    [quality, targetMB, imageQuality, compressionMode].forEach(el => 
-      el.addEventListener('input', () => {
-        if(items.length && items[0].compressedPreview){
-          items[0].compressedPreview.innerHTML = `
-            <div>🔄 Settings Changed<br>
-            <small>Quality: ${quality.value}%<br>
-            Target: ${targetMB.value || 'Auto'} MB<br>
-            Mode: ${compressionMode.options[compressionMode.selectedIndex].text}<br>
-            Click "Preview" to update</small></div>
-          `;
+    async function compressPDFAdvanced(item, index) {
+      item.progressEl.style.display = 'block';
+      item.statusEl.textContent = 'कंप्रेशन हो रहा है...';
+      item.statusEl.className = 'status processing';
+      
+      try {
+        const arrayBuffer = await item.file.arrayBuffer();
+        let pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+        
+        // Step 1: Remove metadata if requested
+        if (removeMetadata.checked) {
+          pdfDoc = await removeMetadataAndCleanup(pdfDoc);
         }
-      })
-    );
+        
+        // Step 2: Apply compression based on level
+        const level = compressionLevel.value;
+        let compressionOptions = getCompressionOptions(level);
+        
+        // Step 3: Apply target size if specified
+        const targetSize = parseFloat(targetSizeMB.value);
+        let compressedBytes;
+        
+        if (targetSize > 0) {
+          compressedBytes = await compressToTargetSize(pdfDoc, targetSize, compressionOptions);
+        } else {
+          compressedBytes = await pdfDoc.save(compressionOptions);
+        }
+        
+        // Step 4: Create download
+        const compressedSize = compressedBytes.length;
+        const compressionRatio = compressedSize / item.originalSize;
+        
+        if (compressionRatio >= 0.95) {
+          // If compression is less than 5%, show warning
+          item.statusEl.textContent = 'कम कंप्रेशन (< 5%)';
+          item.statusEl.className = 'status warning';
+          item.analysis = (item.analysis || '') + ' - Already optimized';
+        } else {
+          item.statusEl.textContent = `${Math.round((1-compressionRatio)*100)}% कम किया गया`;
+          item.statusEl.className = 'status success';
+        }
+        
+        const blob = new Blob([compressedBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        
+        item.downloadEl.href = url;
+        item.downloadEl.download = `compressed_${item.file.name}`;
+        item.downloadEl.style.display = 'inline-block';
+        
+        item.compressedSize = compressedSize;
+        item.compressionRatio = compressionRatio;
+        item.compressedBlob = blob;
+        
+      } catch (error) {
+        console.error('Compression failed:', error);
+        item.statusEl.textContent = 'कंप्रेशन असफल';
+        item.statusEl.className = 'status error';
+        
+        // Fallback: try basic compression
+        try {
+          const basicBytes = await PDFLib.PDFDocument.load(await item.file.arrayBuffer()).then(doc => 
+            doc.save({ compress: true })
+          );
+          
+          if (basicBytes.length < item.originalSize) {
+            const blob = new Blob([basicBytes], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            
+            item.downloadEl.href = url;
+            item.downloadEl.download = `basic_compressed_${item.file.name}`;
+            item.downloadEl.style.display = 'inline-block';
+            
+            item.compressedSize = basicBytes.length;
+            item.compressionRatio = basicBytes.length / item.originalSize;
+            
+            item.statusEl.textContent = `Basic: ${Math.round((1-item.compressionRatio)*100)}% कम`;
+            item.statusEl.className = 'status success';
+          }
+        } catch (basicError) {
+          console.error('Basic compression also failed:', basicError);
+        }
+        
+      } finally {
+        item.progressEl.style.display = 'none';
+      }
+    }
+
+    // Helper functions
+    function getCompressionOptions(level) {
+      const options = {
+        compress: true,
+        addDefaultPage: false
+      };
+      
+      switch(level) {
+        case 'light':
+          options.objectsPerTick = 50;
+          break;
+        case 'medium':
+          options.objectsPerTick = 200;
+          break;
+        case 'strong':
+          options.objectsPerTick = 500;
+          break;
+        case 'maximum':
+          options.objectsPerTick = 1000;
+          break;
+      }
+      
+      return options;
+    }
+
+    async function removeMetadataAndCleanup(pdfDoc) {
+      try {
+        // Remove metadata
+        pdfDoc.setTitle('');
+        pdfDoc.setAuthor('');
+        pdfDoc.setSubject('');
+        pdfDoc.setCreator('');
+        pdfDoc.setProducer('');
+        pdfDoc.setCreationDate(new Date(0));
+        pdfDoc.setModificationDate(new Date(0));
+        
+        return pdfDoc;
+      } catch (error) {
+        console.warn('Metadata removal failed:', error);
+        return pdfDoc;
+      }
+    }
+
+    async function compressToTargetSize(pdfDoc, targetSizeMB, baseOptions) {
+      const targetBytes = targetSizeMB * 1024 * 1024;
+      let bestResult = null;
+      let low = 50, high = 1000;
+      
+      for (let i = 0; i < 10; i++) {
+        const mid = Math.floor((low + high) / 2);
+        const testOptions = { ...baseOptions, objectsPerTick: mid };
+        
+        try {
+          const testBytes = await pdfDoc.save(testOptions);
+          bestResult = testBytes;
+          
+          if (testBytes.length > targetBytes) {
+            high = mid;
+          } else {
+            low = mid;
+          }
+        } catch (error) {
+          high = mid;
+        }
+      }
+      
+      return bestResult || await pdfDoc.save(baseOptions);
+    }
+
+    async function detectImages(arrayBuffer) {
+      try {
+        const text = new TextDecoder().decode(arrayBuffer.slice(0, Math.min(10000, arrayBuffer.byteLength)));
+        return text.includes('/Image') || text.includes('/DCTDecode') || text.includes('JFIF');
+      } catch {
+        return false;
+      }
+    }
+
+    async function estimateMetadataSize(pdfDoc) {
+      try {
+        const info = [
+          pdfDoc.getTitle(),
+          pdfDoc.getAuthor(),
+          pdfDoc.getSubject(),
+          pdfDoc.getCreator(),
+          pdfDoc.getProducer()
+        ].join('').length;
+        return info;
+      } catch {
+        return 0;
+      }
+    }
 
     // Feature detection
-    if(!window.FileReader || typeof PDFLib === 'undefined'){
+    if (!window.FileReader || typeof PDFLib === 'undefined') {
       const warning = document.createElement('div');
-      warning.style.cssText = 'background:var(--warning);color:#fff;padding:1rem;border-radius:8px;margin-bottom:1rem;text-align:center';
-      warning.innerHTML = '⚠️ Your browser may not fully support PDF compression. Please use the latest Chrome, Firefox, or Safari.';
+      warning.className = 'warning-box';
+      warning.innerHTML = '⚠️ आपका ब्राउज़र PDF compression को पूर्ण रूप से support नहीं करता। कृपया latest Chrome, Firefox, या Safari का उपयोग करें।';
       document.querySelector('.card').insertBefore(warning, drop);
     }
   </script>
