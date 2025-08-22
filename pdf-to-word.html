@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PDF to Word — Office Tools</title>
+  <meta name="description" content="Convert text-based PDF files to editable Word documents. Browser-based conversion with no uploads required.">
+  <meta name="keywords" content="pdf to word, pdf to docx converter, online pdf converter">
+  <meta name="robots" content="index, follow">
+  
+  <style>
+    :root {
+      --accent:#0b84ff;
+      --bg:#ffffff;
+      --card:#ffffff;
+      --text:#111111;
+      --muted:#566173;
+      --border:#e5e7eb;
+      --shadow:0 8px 24px rgba(10,20,40,.08);
+      --menu-bg:#ffffff;
+      --success:#22c55e;
+      --error:#ef4444;
+      --warning:#f59e0b;
+    }
+    [data-theme='dark'] {
+      --bg:#0b0f15;
+      --card:#0e141c;
+      --text:#f1f5f9;
+      --muted:#cbd5e1;
+      --border:#1f2a37;
+      --shadow:0 18px 40px rgba(0,0,0,.55);
+      --menu-bg:#101823;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.7rem 1rem;
+      gap: 12px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: var(--accent);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 800;
+    }
+    .brand-name {
+      font-weight: 800;
+      font-size: 1.05rem;
+    }
+    .menu {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .menu > li {
+      list-style: none;
+      position: relative;
+    }
+    .menu > li > a {
+      padding: 0.55rem 0.8rem;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .menu > li:hover > a {
+      background: rgba(11, 132, 255, 0.08);
+    }
+    .submenu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      background: var(--menu-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      min-width: 220px;
+      z-index: 1001;
+    }
+    .submenu a {
+      display: block;
+      padding: 0.6rem 0.9rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    }
+    .submenu a:last-child {
+      border-bottom: none;
+    }
+    .menu > li:hover .submenu {
+      display: block;
+    }
+    .spacer { flex: 1; }
+    .toggle {
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      padding: 0.45rem 0.8rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    main {
+      max-width: 680px;
+      margin: 2.5rem auto 1.5rem;
+      padding: 0 1rem;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 32px;
+    }
+    .upload-area {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 30px;
+      text-align: center;
+      margin-bottom: 22px;
+      background: rgba(11, 132, 255, 0.01);
+      transition: all 0.2s;
+    }
+    .upload-area.dragover {
+      background: rgba(11, 132, 255, 0.1);
+      border-color: var(--accent);
+    }
+    .btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.7rem 1.5rem;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 1rem;
+      margin: 12px 0;
+    }
+    .btn:disabled {
+      background: var(--muted);
+      cursor: not-allowed;
+    }
+    .status {
+      margin: 1.2rem 0 0.7rem 0;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    .status.info {
+      background: rgba(59, 130, 246, 0.1);
+      color: #2563eb;
+    }
+    .status.error {
+      background: rgba(239, 68, 68, 0.1);
+      color: #dc2626;
+    }
+    .status.success {
+      background: rgba(34, 197, 94, 0.1);
+      color: #059669;
+    }
+    .status.warning {
+      background: rgba(245, 158, 11, 0.1);
+      color: #d97706;
+    }
+    @media (max-width: 768px) {
+      .menu { display: none; }
+      .card { padding: 18px; }
+      main { padding: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="nav">
+      <div class="brand">
+        <div class="brand-badge">OT</div>
+        <div class="brand-name">Office Tools</div>
+      </div>
+      <ul class="menu">
+        <li><a href="index.html">Home</a></li>
+        <li>
+          <a href="#">PDF Tools ▾</a>
+          <div class="submenu">
+            <a href="#">PDF Compressor</a>
+            <a href="pdf-to-word.html">PDF to Word</a>
+          </div>
+        </li>
+        <li>
+          <a href="#">Excel Tools ▾</a>
+          <div class="submenu">
+            <a href="#">Excel to PDF</a>
+          </div>
+        </li>
+        <li>
+          <a href="#">Image Tools ▾</a>
+          <div class="submenu">
+            <a href="img-compress.html">Image Compressor</a>
+            <a href="img-editor.html">Image Editor</a>
+          </div>
+        </li>
+      </ul>
+      <div class="spacer"></div>
+      <button id="modeToggle" class="toggle" type="button">🌙 Dark</button>
+    </nav>
+  </header>
+
+  <main>
+    <div class="card">
+      <h1 style="margin: 0 0 18px 0;">PDF to Word Converter</h1>
+      <p style="color: var(--muted); margin-bottom: 22px;">
+        Convert text-based PDF files to editable Word documents (<strong>DOCX</strong>). Works with text PDFs only.
+      </p>
+
+      <div id="libraryStatus" class="status warning" style="display: none;">
+        📦 Loading conversion libraries... Please wait.
+      </div>
+
+      <div class="upload-area" id="dropArea">
+        <div style="font-size: 2rem; margin-bottom: 12px;">📄</div>
+        <strong>Drop PDF file here</strong><br>or<br>
+        <button id="browseBtn" type="button" class="btn" style="padding: 0.5rem 1rem; font-size: 0.9rem; margin: 8px;">Browse Files</button>
+        <input type="file" id="fileInput" accept="application/pdf" style="display:none">
+      </div>
+
+      <div class="status info" id="statusMsg">Select a PDF file to begin conversion</div>
+      
+      <button type="button" class="btn" id="convertBtn" disabled>Convert to Word</button>
+      <a id="downloadLink" class="btn" style="display:none; background: var(--success); margin-left: 10px;" download>📥 Download DOCX</a>
+    </div>
+
+    <!-- Google AdSense Placeholder -->
+    <div style="margin: 2rem 0; text-align: center;">
+      <div style="border: 1px dashed var(--border); border-radius: 8px; padding: 40px 12px; color: var(--muted);">
+        Google AdSense Advertisement<br>
+        <small>Replace with your actual AdSense code</small>
+      </div>
+    </div>
+  </main>
+
+  <footer style="padding: 20px; text-align: center; color: var(--muted);">
+    &copy; <span id="year"></span> Office Tools. All rights reserved.
+  </footer>
+
+  <script>
+    // Theme toggle
+    (function() {
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const saved = localStorage.getItem('theme');
+      const initial = saved || (prefersDark ? 'dark' : 'light');
+      const root = document.documentElement;
+      const btn = document.getElementById('modeToggle');
+      
+      function apply(theme) {
+        root.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        btn.textContent = theme === 'dark' ? '☀️ Light' : '🌙 Dark';
+      }
+      apply(initial);
+      btn.addEventListener('click', () => {
+        apply(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+      });
+      document.getElementById('year').textContent = new Date().getFullYear();
+    })();
+
+    // Elements
+    const dropArea = document.getElementById('dropArea');
+    const browseBtn = document.getElementById('browseBtn');
+    const fileInput = document.getElementById('fileInput');
+    const convertBtn = document.getElementById('convertBtn');
+    const statusMsg = document.getElementById('statusMsg');
+    const downloadLink = document.getElementById('downloadLink');
+    const libraryStatus = document.getElementById('libraryStatus');
+
+    let currentFile = null;
+    let pdfjsLib = null;
+    let docx = null;
+
+    // Show library loading status
+    libraryStatus.style.display = 'block';
+
+    // Load libraries dynamically with fallbacks
+    async function loadLibraries() {
+      try {
+        // Try to load PDF.js from multiple CDNs
+        await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+        if (typeof window.pdfjsLib === 'undefined') {
+          await loadScript('https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js');
+        }
+        pdfjsLib = window.pdfjsLib;
+        
+        // Set worker
+        if (pdfjsLib) {
+          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+
+        // Try to load DOCX.js from multiple CDNs
+        await loadScript('https://unpkg.com/docx@7.8.2/build/index.js');
+        if (typeof window.docx === 'undefined') {
+          await loadScript('https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.js');
+        }
+        docx = window.docx;
+
+        if (pdfjsLib && docx) {
+          libraryStatus.innerHTML = '✅ Libraries loaded successfully!';
+          libraryStatus.className = 'status success';
+          setTimeout(() => {
+            libraryStatus.style.display = 'none';
+          }, 2000);
+        } else {
+          throw new Error('Failed to load required libraries');
+        }
+      } catch (error) {
+        libraryStatus.innerHTML = '❌ Failed to load conversion libraries. Please check your internet connection and refresh the page.';
+        libraryStatus.className = 'status error';
+        console.error('Library loading error:', error);
+      }
+    }
+
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    }
+
+    // Load libraries when page loads
+    window.addEventListener('load', loadLibraries);
+
+    // Browse button click
+    browseBtn.addEventListener('click', function() {
+      fileInput.click();
+    });
+
+    // File input change
+    fileInput.addEventListener('change', function() {
+      if (this.files && this.files.length > 0) {
+        handleFile(this.files[0]);
+      }
+    });
+
+    // Drag and Drop events
+    dropArea.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.classList.add('dragover');
+    });
+
+    dropArea.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.classList.remove('dragover');
+    });
+
+    dropArea.addEventListener('drop', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.classList.remove('dragover');
+      
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleFile(files[0]);
+      }
+    });
+
+    // Handle file
+    function handleFile(file) {
+      if (file.type !== 'application/pdf') {
+        showStatus('Please select a valid PDF file.', 'error');
+        return;
+      }
+      
+      if (file.size > 50 * 1024 * 1024) { // 50MB
+        showStatus('File too large. Maximum size is 50MB.', 'error');
+        return;
+      }
+
+      currentFile = file;
+      showStatus(`PDF file "${file.name}" loaded successfully. Click Convert to proceed.`, 'success');
+      convertBtn.disabled = false;
+    }
+
+    // Show status
+    function showStatus(message, type = 'info') {
+      statusMsg.textContent = message;
+      statusMsg.className = `status ${type}`;
+    }
+
+    // Convert button with simplified logic
+    convertBtn.addEventListener('click', async function() {
+      if (!currentFile) return;
+
+      // Check if libraries are loaded
+      if (!pdfjsLib || !docx) {
+        showStatus('❌ Conversion libraries not ready. Please wait for libraries to load and try again.', 'error');
+        return;
+      }
+
+      convertBtn.disabled = true;
+      downloadLink.style.display = 'none';
+      showStatus('Converting PDF to Word...', 'info');
+
+      try {
+        // Read PDF
+        const arrayBuffer = await currentFile.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+        
+        let allText = '';
+        const totalPages = pdf.numPages;
+
+        // Extract text from all pages
+        for (let i = 1; i <= totalPages; i++) {
+          const page = await pdf.getPage(i);
+          const textContent = await page.getTextContent();
+          const pageText = textContent.items.map(item => item.str).join(' ').trim();
+          
+          if (pageText) {
+            allText += `Page ${i}:\n${pageText}\n\n`;
+          }
+        }
+
+        if (!allText.trim()) {
+          throw new Error('No extractable text found in this PDF. It may be a scanned document.');
+        }
+
+        // Create simple DOCX
+        const doc = new docx.Document({
+          sections: [{
+            properties: {},
+            children: [
+              new docx.Paragraph({
+                children: [new docx.TextRun(allText)]
+              })
+            ]
+          }]
+        });
+
+        // Generate download
+        const blob = await docx.Packer.toBlob(doc);
+        const url = URL.createObjectURL(blob);
+        
+        const fileName = currentFile.name.replace(/\.pdf$/i, '') + '.docx';
+        downloadLink.href = url;
+        downloadLink.download = fileName;
+        downloadLink.style.display = 'inline-block';
+
+        showStatus(`✅ Conversion successful! Extracted text from ${totalPages} page(s).`, 'success');
+
+      } catch (error) {
+        console.error('Conversion error:', error);
+        showStatus('❌ Conversion failed. This PDF may not contain extractable text or may be corrupted.', 'error');
+      } finally {
+        convertBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

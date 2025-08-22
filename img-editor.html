@@ -117,7 +117,7 @@
     <div class="card">
       <h1 style="margin:0 0 8px 0">Image Editor</h1>
       <p style="color:var(--muted);margin-bottom:24px">Upload and edit your image in-browser. Crop, adjust brightness and contrast, convert to black & white, flip, rotate, and more.</p>
-
+				
       <div class="editor-area">
         <div class="editor-canvas-wrap">
           <canvas id="editorCanvas" width="400" height="400" style="background:#f7fafc;display:none"></canvas>
@@ -177,6 +177,45 @@
         <!-- Fallback placeholder for demo -->
         <div style="padding:40px;border:1px dashed var(--border);border-radius:8px;">Google AdSense Advertisement Placeholder<br><small>Replace with your actual AdSense code</small></div>
       </div>
+	  </div>
+	  
+	  <div class="card" style="margin:1rem 0;">
+	  
+	  <h4>*Instructions for the Image Editor*</h4>
+		<h5>How to Use the Image Editor:</h5>
+		<li><strong>Upload Image</strong> </li>
+		<p>Click the “Upload Image” button to select an image from your device.</p>
+		<p>The image will appear on the canvas for editing.</p>
+		
+		<li><strong>Crop Image</strong> </li>
+		<p>Click the Crop button to activate crop mode.</p>
+		<p>Click and drag on the image to draw a crop rectangle.</p>
+		<p>Release the mouse button to commit the crop and update the image.</p>
+		<p>Crop mode will deactivate automatically after you finish cropping.</p>
+		
+		<li><strong>Adjust Brightness and Contrast</strong> </li>
+		<p>Use the Brightness and Contrast sliders to adjust the image.</p>
+		<p>Changes are non-destructive and based on the original uploaded image.</p>
+		<p>You can freely slide back and forth without quality loss.</p>
+		
+		<li><strong>Black & White Conversion</strong> </li>
+		<p>Click the Toggle Black & White button to convert the image to grayscale.</p>
+		<p>Toggle again to return to color.</p>
+		<p>This works together with brightness and contrast adjustments.</p>
+		
+		<li><strong>Flip and Rotate</strong> </li>
+		<p>Use the Flip Horizontal, Flip Vertical, and Rotate 90° buttons to transform the image.</p>
+	
+		<li><strong>Reset Adjustments</strong> </li>
+		<p>The Reset Adjustments button restores the image to the original uploaded photo, clearing any edits, cropping, and filters.</p>
+		
+		<li><strong>Clear Image</strong> </li>
+		<p>The Clear button resets the editor completely, allowing you to upload a new image without refreshing the page.</p>
+
+		<li><strong>Download</strong> </li>
+		<p>When done, click Download to save the edited image as a PNG file.</p>
+	  
+	  
     </div>
   </main>
 
@@ -213,6 +252,7 @@
     const emptyCanvasMsg = document.getElementById('emptyCanvasMsg');
     const uploadBtn = document.getElementById('uploadBtn');
     let img = null;
+	let uploadOriginalImage = null; // <- NEW
     let originalImage = null;
     let workingCanvas = null;
     let blackWhiteMode = false;
@@ -235,7 +275,7 @@
       previewImg.style.display = "none";
       emptyCanvasMsg.style.display = "none";
     }
-
+//file upload handler
     uploadBtn.addEventListener('click', ()=>fileInput.click());
     fileInput.addEventListener('change', e => {
       const file = e.target.files[0];
@@ -244,6 +284,12 @@
         reader.onload = function(ev){
           img = new Image();
           img.onload = ()=> {
+		  // Keep the true original always!
+			uploadOriginalImage = document.createElement("canvas");
+			uploadOriginalImage.width = img.width;
+			uploadOriginalImage.height = img.height;
+			uploadOriginalImage.getContext("2d").drawImage(img,0,0);
+			
             editorCanvas.width = img.width;
             editorCanvas.height = img.height;
             ctx.drawImage(img, 0, 0);
@@ -316,15 +362,21 @@
       blackWhiteMode = !blackWhiteMode;
       applyEditor();
     });
-
+//reset handler
     document.getElementById('resetBtn').addEventListener('click', ()=>{
-      if(originalImage) {
+      if(uploadOriginalImage) {
+		//Restore from truly original
+		originalImage.width = uploadOriginalImage.width;
+		originalImage.height = uploadOriginalImage.height;
+		originalImage.getContext('2d').drawImage(uploadOriginalImage,0,0);
+		
+		workingCanvas.width = uploadOriginalImage.width;
+		workingCanvas.height = uploadOriginalImage.height;
+		workingCanvas.getContext('2d').drawImage(uploadOriginalImage,0,0);
+		
         blackWhiteMode = false;
         document.getElementById('brightness').value=100;
         document.getElementById('contrast').value=100;
-        workingCanvas.width = originalImage.width;
-        workingCanvas.height = originalImage.height;
-        workingCanvas.getContext('2d').drawImage(originalImage,0,0);
         drawWorkingCanvas();
       }
     });
@@ -347,7 +399,7 @@
       if (!workingCanvas) return;
       cropMode = true;
       cropping = false;
-      alert('Click and drag on the image to select crop area.');
+      //alert('Click and drag on the image to select crop area.');
     });
 
     editorCanvas.addEventListener('mousedown', function(e){
