@@ -93,28 +93,35 @@
       background: rgba(11, 132, 255, 0.08);
     }
     .submenu {
-      display: none;
-      position: absolute;
-      top: calc(100% + 6px);
-      left: 0;
-      background: var(--menu-bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      box-shadow: var(--shadow);
-      min-width: 220px;
-      z-index: 1001;
-    }
-    .submenu a {
-      display: block;
-      padding: 0.6rem 0.9rem;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-    }
-    .submenu a:last-child {
-      border-bottom: none;
-    }
-    .menu > li:hover .submenu {
-      display: block;
-    }
+  display: none;
+  position: absolute;
+  top: 100%;   /* removed gap */
+  left: 0;
+  background: var(--menu-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  min-width: 220px;
+  max-height: 60vh;
+  overflow: auto;
+  z-index: 1001; /* make sure it stays on top */
+}
+
+.submenu a {
+  display: block;
+  padding: .6rem .9rem;
+  border-bottom: 1px solid rgba(0,0,0,.04);
+}
+.submenu a:last-child {
+  border-bottom: none;
+}
+
+/* Keep submenu visible if hovering inside it */
+.menu > li:hover .submenu,
+.menu > li .submenu:hover {
+  display: block;
+}
+
     .spacer { flex: 1; }
     .toggle {
       border: 1px solid var(--border);
