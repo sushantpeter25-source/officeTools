@@ -93,26 +93,35 @@
       background: rgba(11, 132, 255, .08);
     }
     .submenu {
-      display: none;
-      position: absolute;
-      top: 100%;
-      left: 0;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      box-shadow: var(--shadow);
-      min-width: 220px;
-      max-height: 60vh;
-      overflow: auto;
-    }
-    .submenu a {
-      display: block;
-      padding: .6rem .9rem;
-      border-bottom: 1px solid var(--border);
-    }
-    .submenu a:last-child {
-      border-bottom: none;
-    }
+	  display: none;
+	  position: absolute;
+	  top: 100%;  /* removed 6px gap */
+	  left: 0;
+	  background: var(--surface);
+	  border: 1px solid var(--border);
+	  border-radius: 10px;
+	  box-shadow: var(--shadow);
+	  min-width: 220px;
+	  max-height: 60vh;
+	  overflow: auto;
+	  z-index: 999; /* keep submenu above other elements */
+	}
+	
+	.submenu a {
+	  display: block;
+	  padding: .6rem .9rem;
+	  border-bottom: 1px solid var(--border);
+	}
+	.submenu a:last-child {
+	  border-bottom: none;
+	}
+	
+	/* keep submenu open when hovering over it */
+	.menu > li:hover .submenu,
+	.menu > li .submenu:hover {
+	  display: block;
+	}
+
     .menu > li:hover .submenu {
       display: block;
     }
