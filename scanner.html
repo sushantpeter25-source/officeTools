@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="hi" data-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Web Document Scanner — Office Tools</title>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Cropper.js for image editing/cropping -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- pdf.js for rendering PDF pages as images -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+    <style>
+        :root {
+            --accent: #0b84ff;
+            --bg: #ffffff;
+            --card: #ffffff;
+            --text: #111111;
+            --muted: #566173;
+            --border: #e5e7eb;
+            --shadow: 0 8px 24px rgba(10,20,40,.08);
+            --menu-bg: #ffffff;
+            --success: #22c55e;
+            --warning: #f59e0b;
+        }
+        [data-theme="dark"]{
+            --bg: #0b0f15;
+            --card: #0e141c;
+            --text: #f1f5f9;
+            --muted: #cbd5e1;
+            --border: #1f2a37;
+            --shadow: 0 18px 40px rgba(0,0,0,.55);
+            --menu-bg: #101823;
+        }
+        *{box-sizing:border-box}
+        body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);}
+        a{color:inherit;text-decoration:none}
+        header{position:sticky;top:0;z-index:1000;background:var(--card);box-shadow:var(--shadow);border-bottom:1px solid var(--border);}
+        .nav{display:flex;align-items:center;justify-content:space-between;max-width:1200px;margin:0 auto;padding:.7rem 1rem;gap:12px}
+        .brand{display:flex;align-items:center;gap:10px}
+        .brand-badge{width:36px;height:36px;border-radius:9px;background:var(--accent);display:grid;place-items:center;color:#fff;font-weight:800}
+        .brand-name{font-weight:800;font-size:1.05rem}
+        .menu{display:flex;gap:10px;align-items:center}
+        .menu > li{list-style:none;position:relative}
+        .menu > li > a{padding:.55rem .8rem;border-radius:8px;display:flex;align-items:center;gap:6px;font-size:0.95rem;font-weight:500;}
+        .menu > li:hover > a{background:rgba(11,132,255,.08)}
+        .submenu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--menu-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            min-width: 220px;
+            max-height: 60vh;
+            overflow: auto;
+            z-index: 1001;
+        }
+        .submenu a {
+            display: block;
+            padding: .6rem .9rem;
+            border-bottom: 1px solid rgba(0,0,0,.04);
+            font-size: 0.9rem;
+        }
+        .submenu a:last-child { border-bottom: none; }
+        .menu > li:hover .submenu, .menu > li .submenu:hover { display: block; }
+        .spacer{flex:1}
+        .toggle{border:1px solid var(--border);background:transparent;color:var(--text);padding:.45rem .8rem;border-radius:8px;cursor:pointer}
+        
+        main{max-width:1200px;margin:1.5rem auto;padding:0 1rem}
+        .card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:24px;}
+        
+        /* Action Bar / Controls */
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn:active { transform: scale(0.98); }
+        .btn:disabled { background: var(--muted); cursor: not-allowed; opacity: 0.6; }
+
+        .btn-secondary { background-color: #0284c7; }
+        .btn-success { background-color: var(--success); }
+        .btn-warning { background-color: var(--warning); color: #fff; }
+
+        input[type="file"] { display: none; }
+
+        /* Pages Grid */
+        .section-title {
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            color: var(--text);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        .pages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 16px;
+            min-height: 150px;
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            background: var(--bg);
+        }
+
+        .page-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            cursor: grab;
+            transition: transform 0.2s;
+        }
+        .page-card:active { cursor: grabbing; }
+        .page-card.dragging { opacity: 0.4; border: 2px dashed var(--accent); }
+        .page-card.drag-over { border: 2px solid var(--accent); transform: scale(1.02); }
+
+        .page-preview {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            background: var(--border);
+            pointer-events: none;
+        }
+
+        .page-footer {
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card);
+            border-top: 1px solid var(--border);
+        }
+
+        .page-number {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .drag-handle { cursor: grab; color: var(--muted); }
+
+        .page-actions { display: flex; gap: 4px; }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: var(--muted);
+            padding: 4px;
+            border-radius: 4px;
+            transition: color 0.2s, background-color 0.2s;
+        }
+        .icon-btn:hover { color: var(--accent); background: rgba(11,132,255,.08); }
+        .icon-btn.delete:hover { color: #dc2626; background: rgba(220,38,38,.08); }
+
+        .empty-notice {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            padding: 40px;
+            text-align: center;
+        }
+        .empty-notice i { font-size: 2.5rem; margin-bottom: 10px; }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        .modal-content {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            max-width: 650px;
+            width: 100%;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            max-height: 92vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+        }
+        .modal-header {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .img-container {
+            max-height: 40vh;
+            min-height: 180px;
+            margin-bottom: 16px;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .img-container img { max-width: 100%; max-height: 40vh; display: block; }
+
+        .camera-container {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            max-height: 60vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        #webcamVideo { width: 100%; max-height: 50vh; object-fit: contain; display: block; }
+
+        .adjust-controls {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .slider-group { display: flex; align-items: center; gap: 12px; }
+        .slider-group label { font-size: 0.9rem; font-weight: 600; min-width: 90px; color: var(--muted); margin: 0; }
+        .slider-group input[type="range"] { flex: 1; accent-color: var(--accent); }
+        .slider-value { font-size: 0.85rem; min-width: 35px; text-align: right; color: var(--muted); }
+
+        .modal-tools { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 16px; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; }
+
+        /* Export & Share Section */
+        .export-section {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .export-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+        .file-name-input {
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--text);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            flex: 1;
+            min-width: 220px;
+            outline: none;
+        }
+        .file-name-input:focus { border-color: var(--accent); }
+
+        .footer{padding:20px;text-align:center;color:var(--muted);margin-top:32px;}
+    </style>
+</head>
+<body>
+
+  <!-- Navigation Header matching Office Tools -->
+  <header>
+    <nav class="nav">
+      <div class="brand">
+        <div class="brand-badge">OT</div>
+        <div class="brand-name">Office Tools</div>
+      </div>
+      <ul class="menu">
+        <li><a href="#">Home</a></li>
+        <li>
+          <a href="#">PDF Tools ▾</a>
+          <div class="submenu">
+            <a href="#">PDF Compressor</a>
+            <a href="#">PDF Editor</a>
+            <a href="#">PDF to Image</a>
+            <a href="#">PDF to Word</a>
+            <a href="#">PDF to Excel</a>
+          </div>
+        </li>
+        <li>
+          <a href="#">Excel Tools ▾</a>
+          <div class="submenu">
+            <a href="#">Excel to PDF</a>
+            <a href="#">XLS to XLSX</a>
+          </div>
+        </li>
+        <li>
+          <a href="#">Image Tools ▾</a>
+          <div class="submenu">
+            <a href="#">Image Compressor</a>
+            <a href="#">Image Editor</a>
+            <a href="#">Image to PDF</a>
+          </div>
+        </li>
+      </ul>
+      <div class="spacer"></div>
+      <button id="modeToggle" class="toggle" type="button">🌙 Dark</button>
+    </nav>
+  </header>
+
+  <!-- Main Content Area -->
+  <main>
+    <div class="card">
+      <h1 style="margin:0 0 8px 0; font-size: 1.5rem;">Web Document Scanner & PDF Editor</h1>
+      <p style="color:var(--muted);margin-bottom:24px">कैमरा, वेबकैम या पीडीएफ से पेज जोड़ें, ड्रैग & ड्रॉप से क्रम बदलें, ब्राइटनेस/कलर सुधारें और पीडीएफ शेयर करें।</p>
+
+      <!-- Action Bar -->
+      <div class="action-bar">
+        <button class="btn btn-secondary" id="openCameraBtn" type="button">
+            <i class="fa-solid fa-camera"></i> कैमरा/स्कैनर से फोटो लें
+        </button>
+
+        <label class="btn">
+            <i class="fa-solid fa-image"></i> गैलरी/इमेज चुनें
+            <input type="file" id="imageInput" accept="image/*" multiple>
+        </label>
+
+        <label class="btn btn-warning">
+            <i class="fa-solid fa-file-pdf"></i> पीडीएफ फाइल चुनें
+            <input type="file" id="pdfInput" accept="application/pdf">
+        </label>
+
+        <button class="btn btn-success" id="generatePdfBtn" type="button" disabled>
+            <i class="fa-solid fa-download"></i> पीडीएफ सेव करें
+        </button>
+      </div>
+
+      <!-- Hidden Inputs -->
+      <input type="file" id="nativeCameraInput" accept="image/*" capture="environment" style="display: none;">
+      <input type="file" id="nativeFrontCameraInput" accept="image/*" capture="user" style="display: none;">
+      <input type="file" id="hardwareScannerInput" accept="image/*" style="display: none;">
+
+      <!-- Scanned Pages Display -->
+      <div class="section-title">
+          <span>स्कैन किए गए पेज (<span id="pageCount">0</span>)</span>
+          <span style="font-size: 0.85rem; color: var(--muted);">(पेज को माउस से पकड़कर खींचें और छोड़ें - Drag & Drop)</span>
+      </div>
+
+      <div class="pages-grid" id="pagesGrid">
+          <div class="empty-notice" id="emptyNotice">
+              <i class="fa-solid fa-scanner-image"></i>
+              <p>अभी तक कोई डॉक्यूमेंट नहीं जोड़ा गया है।</p>
+              <p style="font-size: 0.85rem;">ऊपर दिए गए बटनों का उपयोग करके फोटो या पीडीएफ जोड़ें।</p>
+          </div>
+      </div>
+
+      <!-- Export & Share Section -->
+      <div class="export-section" id="exportSection" style="display: none;">
+          <div class="export-row">
+              <input type="text" id="pdfFileName" class="file-name-input" value="Scanned_Document.pdf" placeholder="पीडीएफ फाइल का नाम">
+              <div style="display: flex; gap: 8px;">
+                  <button class="btn btn-secondary" id="shareBtn" type="button">
+                      <i class="fa-solid fa-share-nodes"></i> शेयर करें (WhatsApp / Bluetooth)
+                  </button>
+              </div>
+          </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Webcam Modal -->
+  <div class="modal" id="cameraModal">
+      <div class="modal-content" style="max-width: 700px;">
+          <div class="modal-header">
+              <span id="cameraModalTitle">कैमरा/स्कैनर कैप्चर</span>
+              <button class="icon-btn" id="closeCameraModalBtn" type="button"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          
+          <div id="mobileCameraOptions" style="display: none; margin-bottom: 15px; text-align: center; padding: 20px; background: var(--bg); border-radius: 8px; border: 1px solid var(--border);">
+              <p style="margin-bottom: 15px; font-weight: 600;">मोबाइल का कौन सा कैमरा उपयोग करना चाहते हैं?</p>
+              <div style="display: flex; gap: 15px; justify-content: center;">
+                  <button class="btn" onclick="triggerNativeCapture('user')" type="button"><i class="fa-solid fa-user"></i> फ्रंट कैमरा (Selfie)</button>
+                  <button class="btn btn-secondary" onclick="triggerNativeCapture('environment')" type="button"><i class="fa-solid fa-camera-rotate"></i> बैक कैमरा (Rear)</button>
+              </div>
+          </div>
+
+          <div class="camera-container" id="webcamContainer">
+              <video id="webcamVideo" autoplay playsinline></video>
+              <canvas id="snapshotCanvas" style="display: none;"></canvas>
+          </div>
+
+          <div class="modal-footer" id="cameraFooter">
+              <button class="btn" style="background-color: var(--muted);" id="cancelCameraBtn" type="button">रद्द करें</button>
+              <button class="btn btn-success" id="capturePhotoBtn" type="button"><i class="fa-solid fa-camera"></i> फोटो खींचें</button>
+          </div>
+      </div>
+  </div>
+
+  <!-- Image Editor & Color Adjust Modal -->
+  <div class="modal" id="editorModal">
+      <div class="modal-content">
+          <div class="modal-header">
+              <span>डॉक्यूमेंट एडिट, क्रॉप और कलर एडजस्ट करें</span>
+              <button class="icon-btn" id="closeEditorModalBtn" type="button"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          
+          <div class="img-container">
+              <img id="imageToEdit" src="" alt="Edit">
+          </div>
+
+          <div class="adjust-controls">
+              <div class="slider-group">
+                  <label><i class="fa-solid fa-sun"></i> ब्राइटनेस</label>
+                  <input type="range" id="brightnessRange" min="50" max="150" value="100" oninput="applyFiltersLive()">
+                  <span class="slider-value" id="brightnessVal">100%</span>
+              </div>
+              <div class="slider-group">
+                  <label><i class="fa-solid fa-circle-half-stroke"></i> कंट्रास्ट</label>
+                  <input type="range" id="contrastRange" min="50" max="180" value="100" oninput="applyFiltersLive()">
+                  <span class="slider-value" id="contrastVal">100%</span>
+              </div>
+          </div>
+
+          <div class="modal-tools">
+              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;" onclick="rotateImage(90)" type="button"><i class="fa-solid fa-rotate-right"></i> घुमाएं</button>
+              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;" onclick="resetEditor()" type="button"><i class="fa-solid fa-arrow-rotate-left"></i> रीसेट</button>
+              <button class="btn btn-warning" style="padding: 6px 12px; font-size: 0.85rem;" onclick="filterBwDocument()" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i> डॉक्‍यूमेंट B&W</button>
+          </div>
+
+          <div class="modal-footer">
+              <button class="btn" style="background-color: var(--muted);" id="cancelEditBtn" type="button">रद्द करें</button>
+              <button class="btn btn-success" id="saveEditBtn" type="button"><i class="fa-solid fa-check"></i> बदलाव सेव करें</button>
+          </div>
+      </div>
+  </div>
+
+  <footer>
+      <div class="footer">&copy; <span id="year"></span> Office Tools. All rights reserved.</div>
+  </footer>
+
+  <!-- Cropper.js Script -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+  <script>
+      // Dark mode toggle + year label
+      (function(){
+          const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const saved = localStorage.getItem('theme');
+          const initial = saved || (prefersDark ? 'dark' : 'light');
+          const root = document.documentElement;
+          const btn = document.getElementById('modeToggle');
+          function apply(theme){
+              root.setAttribute('data-theme', theme);
+              localStorage.setItem('theme', theme);
+              btn.textContent = theme === 'dark' ? '☀️ Light' : '🌙 Dark';
+          }
+          apply(initial);
+          btn.addEventListener('click', () => {
+              const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+              apply(next);
+          });
+          document.getElementById('year').textContent = new Date().getFullYear();
+      })();
+
+      let pages = []; 
+      let currentEditIndex = -1;
+      let cropper = null;
+      let mediaStream = null;
+      let draggedIndex = null;
+
+      const openCameraBtn = document.getElementById('openCameraBtn');
+      const imageInput = document.getElementById('imageInput');
+      const pdfInput = document.getElementById('pdfInput');
+      const nativeCameraInput = document.getElementById('nativeCameraInput');
+      const nativeFrontCameraInput = document.getElementById('nativeFrontCameraInput');
+      const hardwareScannerInput = document.getElementById('hardwareScannerInput');
+      const pagesGrid = document.getElementById('pagesGrid');
+      const emptyNotice = document.getElementById('emptyNotice');
+      const pageCountSpan = document.getElementById('pageCount');
+      const generatePdfBtn = document.getElementById('generatePdfBtn');
+      const exportSection = document.getElementById('exportSection');
+      
+      const cameraModal = document.getElementById('cameraModal');
+      const closeCameraModalBtn = document.getElementById('closeCameraModalBtn');
+      const cancelCameraBtn = document.getElementById('cancelCameraBtn');
+      const webcamVideo = document.getElementById('webcamVideo');
+      const capturePhotoBtn = document.getElementById('capturePhotoBtn');
+      const webcamContainer = document.getElementById('webcamContainer');
+      const cameraFooter = document.getElementById('cameraFooter');
+      const mobileCameraOptions = document.getElementById('mobileCameraOptions');
+      const cameraModalTitle = document.getElementById('cameraModalTitle');
+
+      const editorModal = document.getElementById('editorModal');
+      const imageToEdit = document.getElementById('imageToEdit');
+      const closeEditorModalBtn = document.getElementById('closeEditorModalBtn');
+      const cancelEditBtn = document.getElementById('cancelEditBtn');
+      const saveEditBtn = document.getElementById('saveEditBtn');
+      const brightnessRange = document.getElementById('brightnessRange');
+      const contrastRange = document.getElementById('contrastRange');
+      const brightnessVal = document.getElementById('brightnessVal');
+      const contrastVal = document.getElementById('contrastVal');
+      const shareBtn = document.getElementById('shareBtn');
+
+      function isMobileDevice() {
+          return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+      }
+
+      imageInput.addEventListener('change', handleImageSelect);
+      pdfInput.addEventListener('change', handlePdfSelect);
+      nativeCameraInput.addEventListener('change', handleImageSelect);
+      nativeFrontCameraInput.addEventListener('change', handleImageSelect);
+      hardwareScannerInput.addEventListener('change', handleImageSelect);
+
+      function handleImageSelect(e) {
+          const files = e.target.files;
+          if (!files || files.length === 0) return;
+
+          Array.from(files).forEach(file => {
+              const reader = new FileReader();
+              reader.onload = function(event) {
+                  pages.push(event.target.result);
+                  updateUI();
+              };
+              reader.readAsDataURL(file);
+          });
+          e.target.value = '';
+      }
+
+      async function handlePdfSelect(e) {
+          const file = e.target.files[0];
+          if (!file || file.type !== 'application/pdf') {
+              alert('कृपया वैध पीडीएफ फाइल (PDF) चुनें।');
+              return;
+          }
+
+          try {
+              const arrayBuffer = await file.arrayBuffer();
+              const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+              const pdfDoc = await loadingTask.promise;
+              
+              for (let i = 1; i <= pdfDoc.numPages; i++) {
+                  const page = await pdfDoc.getPage(i);
+                  const viewport = page.getViewport({ scale: 1.5 });
+                  const canvas = document.createElement('canvas');
+                  const context = canvas.getContext('2d');
+                  canvas.height = viewport.height;
+                  canvas.width = viewport.width;
+
+                  await page.render({ canvasContext: context, viewport: viewport }).promise;
+                  pages.push(canvas.toDataURL('image/jpeg', 0.85));
+              }
+              updateUI();
+          } catch (error) {
+              console.error('PDF parsing error:', error);
+              alert('पीडीएफ फाइल लोड करने में त्रुटि हुई।');
+          }
+          e.target.value = '';
+      }
+
+      openCameraBtn.addEventListener('click', function() {
+          if (isMobileDevice()) {
+              cameraModalTitle.textContent = "मोबाइल कैमरा चुनें";
+              mobileCameraOptions.style.display = 'block';
+              webcamContainer.style.display = 'none';
+              cameraFooter.style.display = 'none';
+              cameraModal.style.display = 'flex';
+          } else {
+              cameraModalTitle.textContent = "लैपटॉप/डेस्कटॉप वेबकैम";
+              mobileCameraOptions.style.display = 'none';
+              webcamContainer.style.display = 'flex';
+              cameraFooter.style.display = 'flex';
+              startDesktopWebcam();
+          }
+      });
+
+      async function startDesktopWebcam() {
+          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+              closeCameraModal();
+              hardwareScannerInput.click();
+              return;
+          }
+
+          try {
+              mediaStream = await navigator.mediaDevices.getUserMedia({
+                  video: { width: { ideal: 1920 }, height: { ideal: 1080 } },
+                  audio: false
+              });
+              webcamVideo.srcObject = mediaStream;
+          } catch (err) {
+              console.warn('Webcam fallback:', err);
+              closeCameraModal();
+              hardwareScannerInput.click();
+          }
+      }
+
+      window.triggerNativeCapture = function(facingMode) {
+          closeCameraModal();
+          if (facingMode === 'user') {
+              nativeFrontCameraInput.click();
+          } else {
+              nativeCameraInput.click();
+          }
+      }
+
+      capturePhotoBtn.addEventListener('click', function() {
+          if (!mediaStream) return;
+          const canvas = document.getElementById('snapshotCanvas');
+          canvas.width = webcamVideo.videoWidth || 1280;
+          canvas.height = webcamVideo.videoHeight || 720;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(webcamVideo, 0, 0, canvas.width, canvas.height);
+          
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          pages.push(dataUrl);
+          updateUI();
+          closeCameraModal();
+      });
+
+      function closeCameraModal() {
+          cameraModal.style.display = 'none';
+          if (mediaStream) {
+              mediaStream.getTracks().forEach(track => track.stop());
+              mediaStream = null;
+          }
+      }
+
+      closeCameraModalBtn.addEventListener('click', closeCameraModal);
+      cancelCameraBtn.addEventListener('click', closeCameraModal);
+
+      function updateUI() {
+          pageCountSpan.textContent = pages.length;
+          if (pages.length === 0) {
+              emptyNotice.style.display = 'flex';
+              generatePdfBtn.disabled = true;
+              exportSection.style.display = 'none';
+              pagesGrid.innerHTML = '';
+              pagesGrid.appendChild(emptyNotice);
+          } else {
+              emptyNotice.style.display = 'none';
+              generatePdfBtn.disabled = false;
+              exportSection.style.display = 'flex';
+              renderPagesGrid();
+          }
+      }
+
+      function renderPagesGrid() {
+          pagesGrid.innerHTML = '';
+          pages.forEach((imgSrc, index) => {
+              const card = document.createElement('div');
+              card.className = 'page-card';
+              card.draggable = true;
+              card.dataset.index = index;
+
+              card.innerHTML = `
+                  <img src="${imgSrc}" class="page-preview" alt="Page ${index + 1}">
+                  <div class="page-footer">
+                      <span class="page-number"><i class="fa-solid fa-grip-vertical drag-handle" title="खींचकर क्रम बदलें"></i> पेज ${index + 1}</span>
+                      <div class="page-actions">
+                          <button class="icon-btn" onclick="openEditor(${index})" title="एडिट / क्रॉप / कलर" type="button"><i class="fa-solid fa-pen-to-square"></i></button>
+                          <button class="icon-btn delete" onclick="deletePage(${index})" title="डिलीट करें" type="button"><i class="fa-solid fa-trash"></i></button>
+                      </div>
+                  </div>
+              `;
+
+              card.addEventListener('dragstart', handleDragStart);
+              card.addEventListener('dragover', handleDragOver);
+              card.addEventListener('dragleave', handleDragLeave);
+              card.addEventListener('drop', handleDrop);
+              card.addEventListener('dragend', handleDragEnd);
+
+              pagesGrid.appendChild(card);
+          });
+      }
+
+      function handleDragStart(e) {
+          draggedIndex = parseInt(this.dataset.index);
+          this.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+      }
+
+      function handleDragOver(e) {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          this.classList.add('drag-over');
+      }
+
+      function handleDragLeave(e) {
+          this.classList.remove('drag-over');
+      }
+
+      function handleDrop(e) {
+          e.preventDefault();
+          this.classList.remove('drag-over');
+          const targetIndex = parseInt(this.dataset.index);
+
+          if (isNaN(draggedIndex) || draggedIndex === targetIndex) return;
+
+          const movedItem = pages.splice(draggedIndex, 1)[0];
+          pages.splice(targetIndex, 0, movedItem);
+
+          renderPagesGrid();
+      }
+
+      function handleDragEnd(e) {
+          this.classList.remove('dragging');
+          document.querySelectorAll('.page-card').forEach(card => {
+              card.classList.remove('drag-over');
+          });
+      }
+
+      window.deletePage = function(index) {
+          if (confirm('क्या आप वाकई इस पेज को हटाना चाहते हैं?')) {
+              pages.splice(index, 1);
+              updateUI();
+          }
+      }
+
+      window.openEditor = function(index) {
+          currentEditIndex = index;
+          imageToEdit.src = pages[index];
+          brightnessRange.value = 100;
+          contrastRange.value = 100;
+          brightnessVal.textContent = '100%';
+          contrastVal.textContent = '100%';
+          editorModal.style.display = 'flex';
+
+          if (cropper) {
+              cropper.destroy();
+          }
+          cropper = new Cropper(imageToEdit, {
+              aspectRatio: NaN,
+              viewMode: 1,
+              autoCropArea: 0.95,
+          });
+      }
+
+      function closeEditorModal() {
+          editorModal.style.display = 'none';
+          if (cropper) {
+              cropper.destroy();
+              cropper = null;
+          }
+      }
+
+      closeEditorModalBtn.addEventListener('click', closeEditorModal);
+      cancelEditBtn.addEventListener('click', closeEditorModal);
+
+      window.rotateImage = function(degree) {
+          if (cropper) {
+              cropper.rotate(degree);
+          }
+      }
+
+      window.resetEditor = function() {
+          brightnessRange.value = 100;
+          contrastRange.value = 100;
+          brightnessVal.textContent = '100%';
+          contrastVal.textContent = '100%';
+          if (cropper) {
+              cropper.reset();
+          }
+      }
+
+      window.applyFiltersLive = function() {
+          brightnessVal.textContent = brightnessRange.value + '%';
+          contrastVal.textContent = contrastRange.value + '%';
+          if (cropper) {
+              const cropperImage = document.querySelector('.cropper-view-box img, .cropper-canvas img');
+              if (cropperImage) {
+                  cropperImage.style.filter = `brightness(${brightnessRange.value}%) contrast(${contrastRange.value}%)`;
+              }
+          }
+      }
+
+      window.filterBwDocument = function() {
+          brightnessRange.value = 120;
+          contrastRange.value = 150;
+          applyFiltersLive();
+      }
+
+      saveEditBtn.addEventListener('click', function() {
+          if (!cropper) return;
+          const canvas = cropper.getCroppedCanvas({
+              maxWidth: 1600,
+              maxHeight: 1600,
+              imageSmoothingEnabled: true,
+              imageSmoothingQuality: 'high',
+          });
+
+          const ctx = canvas.getContext('2d');
+          const brightness = parseInt(brightnessRange.value);
+          const contrast = parseInt(contrastRange.value);
+
+          if (brightness !== 100 || contrast !== 100) {
+              const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+              const data = imgData.data;
+              const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+              
+              for (let i = 0; i < data.length; i += 4) {
+                  let r = data[i] * (brightness / 100);
+                  let g = data[i+1] * (brightness / 100);
+                  let b = data[i+2] * (brightness / 100);
+
+                  r = factor * (r - 128) + 128;
+                  g = factor * (g - 128) + 128;
+                  b = factor * (b - 128) + 128;
+
+                  data[i] = Math.min(255, Math.max(0, r));
+                  data[i+1] = Math.min(255, Math.max(0, g));
+                  data[i+2] = Math.min(255, Math.max(0, b));
+              }
+              ctx.putImageData(imgData, 0, 0);
+          }
+
+          pages[currentEditIndex] = canvas.toDataURL('image/jpeg', 0.85);
+          closeEditorModal();
+          renderPagesGrid();
+      });
+
+      generatePdfBtn.addEventListener('click', function() {
+          if (pages.length === 0) return;
+
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF({
+              orientation: 'portrait',
+              unit: 'mm',
+              format: 'a4'
+          });
+
+          const pageWidth = doc.internal.pageSize.getWidth();
+          const pageHeight = doc.internal.pageSize.getHeight();
+
+          pages.forEach((imgData, index) => {
+              if (index > 0) doc.addPage();
+
+              const img = new Image();
+              img.src = imgData;
+              
+              let imgWidth = pageWidth;
+              let imgHeight = (img.height * pageWidth) / img.width;
+
+              if (imgHeight > pageHeight) {
+                  imgHeight = pageHeight;
+                  imgWidth = (img.width * pageHeight) / img.height;
+              }
+
+              const x = (pageWidth - imgWidth) / 2;
+              const y = (pageHeight - imgHeight) / 2;
+
+              doc.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
+          });
+
+          const fileNameInput = document.getElementById('pdfFileName').value.trim() || 'Scanned_Document.pdf';
+          doc.save(fileNameInput);
+      });
+
+      shareBtn.addEventListener('click', async function() {
+          if (pages.length === 0) return;
+
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF();
+          const pageWidth = doc.internal.pageSize.getWidth();
+          const pageHeight = doc.internal.pageSize.getHeight();
+
+          pages.forEach((imgData, index) => {
+              if (index > 0) doc.addPage();
+              const img = new Image();
+              img.src = imgData;
+              let imgWidth = pageWidth;
+              let imgHeight = (img.height * pageWidth) / img.width;
+              if (imgHeight > pageHeight) {
+                  imgHeight = pageHeight;
+                  imgWidth = (img.width * pageHeight) / img.height;
+              }
+              doc.addImage(imgData, 'JPEG', (pageWidth - imgWidth)/2, (pageHeight - imgHeight)/2, imgWidth, imgHeight);
+          });
+
+          const fileName = document.getElementById('pdfFileName').value.trim() || 'Scanned_Document.pdf';
+          const pdfBlob = doc.output('blob');
+          const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+              try {
+                  await navigator.share({
+                      files: [file],
+                      title: 'स्कैन किया गया डॉक्यूमेंट (PDF)',
+                      text: 'यह लीजिए आपकी स्कैन की गई पीडीएफ फाइल।',
+                  });
+              } catch (error) {
+                  console.log('शेयर रद्द या विफल:', error);
+              }
+          } else {
+              alert('आपका ब्राउज़र सीधे फाइल शेयरिंग का समर्थन नहीं करता है। कृपया "पीडीएफ सेव करें" बटन से फाइल डाउनलोड करें।');
+          }
+      });
+  </script>
+</body>
+</html>
